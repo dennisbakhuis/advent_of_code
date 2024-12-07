@@ -16,14 +16,14 @@ def calculate_product_of_operators(values: list[int], operators: list[Callable])
     values : list[int]
         A list of integer values to be operated upon.
     operators : list[Callable]
-        A list of callable operators (e.g., functions like `operator.add`, 
+        A list of callable operators (e.g., functions like `operator.add`,
         `operator.sub`) to apply between the values.
 
     Returns
     -------
     list[int]
-        A list of results obtained by applying all combinations of the 
-        operators between the values. If an operation results in a 
+        A list of results obtained by applying all combinations of the
+        operators between the values. If an operation results in a
         division by zero, that combination is skipped.
     """
     operator_combinations = product(operators, repeat=len(values) - 1)

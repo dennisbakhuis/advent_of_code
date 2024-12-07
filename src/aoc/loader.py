@@ -36,12 +36,12 @@ class Loader:
             lines = [line.strip() for line in file.readlines()]
 
         if not multiple_parts:
-            return [l for l in lines if l]
+            return [line for line in lines if line]
 
         blocks, current_block = [], []
-        for l in lines:
-            if l:
-                current_block.append(l)
+        for line in lines:
+            if line:
+                current_block.append(line)
             else:
                 if current_block:
                     blocks.append(current_block)
