@@ -20,7 +20,7 @@ class DataFiles:
 
         for input_file in input_files:
             year = int(input_file.parent.parent.name)
-            day = int(input_file.stem[3:].split("_")[0])
+            day = int(input_file.stem[4:].split("_")[0])
             self.input_files[(year, day)] = input_file
 
     def _get_example_files(self):
@@ -30,9 +30,9 @@ class DataFiles:
 
         for example_file in example_files:
             year = int(example_file.parent.parent.name)
-            day = int(example_file.stem[3:].split("_")[0])
+            day = int(example_file.stem[4:].split("_")[0])
 
-            n_files_for_day = len([f for f in example_files if f.stem.startswith(f"day{day:02}")])
+            n_files_for_day = len([f for f in example_files if f.stem.startswith(f"day_{day:02}")])
             if n_files_for_day > 1:
                 number = int(example_file.stem.split("example")[1])
                 example_list = self.example_files.get((year, day), {})

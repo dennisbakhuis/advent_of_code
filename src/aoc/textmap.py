@@ -45,6 +45,22 @@ class TextMap:
         """
         return self._map_string[y * self._n_columns + x]
 
+    def get_many(self, coords: list[tuple[int, int]]) -> tuple[str]:
+        """
+        Get characters at the given coordinates.
+
+        Parameters
+        ----------
+        coords : list of (x, y)
+            Coordinates to fetch.
+
+        Returns
+        -------
+        tuple of str
+            Characters at the given coordinates.
+        """
+        return tuple(self._map_string[y * self._n_columns + x] for x, y in coords)
+
     def set(self, x: int, y: int, value: str) -> None:
         """
         Set the character at the given coordinates.
@@ -121,3 +137,36 @@ class TextMap:
             A new map with the same content.
         """
         return TextMap(self.as_lines())
+
+    def pad(self, pading_size: int | list[int], fill: str = " ") -> "TextMap":
+        """
+        Add padding to the ASCII map on specified sides.
+
+        Parameters
+        ----------
+        padding_size : int or list of int
+            Amount of padding to add. If an integer, it is applied to all sides.
+            If a list, specify [top, bottom, left, right].
+        fill : str
+            Character to use for padding.
+
+        Returns
+        -------
+        TextMap
+            A new map with the padding applied.
+        """
+        if isinstance(pading_size, int):
+            top = bottom = left = right = pading_size
+        elif isinstance(pading_size, list) and len(pading_size) == 4:
+            top, bottom, left, right = pading_size
+        else:
+            raise ValueError("Padding must be an integer or a list of 4 integers [top, bottom, left, right].")
+
+        lines = self.as_lines()
+
+        # Add padding at the top and bottom
+        lines = [fill * (self._n_columns + left + right)] * top + \
+                [fill * left + line + fill * right for line in lines] + \
+                [fill * (self._n_columns + left + right)] * bottom
+
+        return TextMap(lines)

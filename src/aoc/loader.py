@@ -16,10 +16,40 @@ class Loader:
         with open(self.path, "r") as file:
             return file.read()
 
-    def as_lines(self) -> list:
-        """Load data as list of lines."""
+    def as_lines(self, multiple_parts: bool = False) -> list[str] | list[list[str]]:
+        """
+        Load data as a list of lines.
+
+        Parameters
+        ----------
+        multiple_parts : bool, optional
+            If True, return a list of lists, where each inner list represents a
+            block of lines separated by one or more empty lines. If False, return
+            a flat list of all non-empty lines.
+
+        Returns
+        -------
+        list[str] | list[list[str]]
+            A list of lines (if multiple_parts=False) or a list of lists of lines (if multiple_parts=True).
+        """
         with open(self.path, "r") as file:
-            return [line.strip() for line in file.readlines() if line.strip()]
+            lines = [line.strip() for line in file.readlines()]
+
+        if not multiple_parts:
+            return [l for l in lines if l]
+
+        blocks, current_block = [], []
+        for l in lines:
+            if l:
+                current_block.append(l)
+            else:
+                if current_block:
+                    blocks.append(current_block)
+                    current_block = []
+        if current_block:
+            blocks.append(current_block)
+
+        return blocks
 
     def as_2dlist(self) -> list:
         """Load data as 2D list."""
