@@ -1,4 +1,5 @@
 """Data loader class."""
+
 from pathlib import Path
 
 from .textmap import TextMap
@@ -58,4 +59,4 @@ class Loader:
 
     def as_textmap(self) -> TextMap:
         """Load data as TextMap object."""
-        return TextMap(self.as_lines())
+        return TextMap(self.as_lines())  # type: ignore

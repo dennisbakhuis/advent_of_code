@@ -45,7 +45,7 @@ class TextMap:
         """
         return self._map_string[y * self._n_columns + x]
 
-    def get_many(self, coords: list[tuple[int, int]]) -> tuple[str]:
+    def get_many(self, coords: list[tuple[int, int]]) -> tuple[str, ...]:
         """
         Get characters at the given coordinates.
 
@@ -74,9 +74,9 @@ class TextMap:
         value : str
             Character to place at (x, y).
         """
-        if (0 <= x < self._n_columns and 0 <= y < self._n_rows):
+        if 0 <= x < self._n_columns and 0 <= y < self._n_rows:
             ix = y * self._n_columns + x
-            self._map_string = self._map_string[:ix] + value + self._map_string[ix + 1:]
+            self._map_string = self._map_string[:ix] + value + self._map_string[ix + 1 :]
 
     def find(self, value: str) -> tuple[int, int]:
         """
@@ -109,8 +109,11 @@ class TextMap:
         list of tuple of int
             All coordinates (x, y) of the character.
         """
-        return [(ix % self._n_columns, ix // self._n_columns)
-                for ix, c in enumerate(self._map_string) if c == value]
+        return [
+            (ix % self._n_columns, ix // self._n_columns)
+            for ix, c in enumerate(self._map_string)
+            if c == value
+        ]
 
     def as_lines(self) -> list[str]:
         """
@@ -121,7 +124,10 @@ class TextMap:
         list of str
             Each line of the ASCII map.
         """
-        return [self._map_string[i:i + self._n_columns] for i in range(0, len(self._map_string), self._n_columns)]
+        return [
+            self._map_string[i : i + self._n_columns]
+            for i in range(0, len(self._map_string), self._n_columns)
+        ]
 
     def show(self) -> None:
         """Show the map."""
@@ -161,14 +167,18 @@ class TextMap:
         elif isinstance(pading_size, list) and len(pading_size) == 4:
             top, bottom, left, right = pading_size
         else:
-            raise ValueError("Padding must be an integer or a list of 4 integers [top, bottom, left, right].")
+            raise ValueError(
+                "Padding must be an integer or a list of 4 integers [top, bottom, left, right]."
+            )
 
         lines = self.as_lines()
 
         # Add padding at the top and bottom
-        lines = [fill * (self._n_columns + left + right)] * top + \
-                [fill * left + line + fill * right for line in lines] + \
-                [fill * (self._n_columns + left + right)] * bottom
+        lines = (
+            [fill * (self._n_columns + left + right)] * top
+            + [fill * left + line + fill * right for line in lines]
+            + [fill * (self._n_columns + left + right)] * bottom
+        )
 
         return TextMap(lines)
 
@@ -192,4 +202,4 @@ class TextMap:
         bool
             True if the coordinates are outside the map, False otherwise.
         """
-        return  0 <= x < self._n_columns and 0 <= y < self._n_rows
+        return 0 <= x < self._n_columns and 0 <= y < self._n_rows

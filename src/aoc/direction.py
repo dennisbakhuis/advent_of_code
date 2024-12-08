@@ -1,4 +1,5 @@
 """Class to work with direction."""
+
 from enum import Enum
 
 
@@ -72,7 +73,8 @@ class Direction(Enum):
         dx, dy = self.value
         return x + dx, y + dy
 
-    def before(self, x: int, y: int) -> tuple[int, int, "Direction"]:
+    # def before(self, x: int, y: int) -> tuple[int, int, "Direction"]:
+    def before(self, x: int, y: int) -> tuple[int, int]:
         """
         Compute the previous coordinates when moving one step in this direction.
 
@@ -90,7 +92,6 @@ class Direction(Enum):
         """
         dx, dy = self.value
         return x - dx, y - dy
-
 
     def next_move_out_of_bounds(self, x: int, y: int, width: int, height: int) -> bool:
         """
