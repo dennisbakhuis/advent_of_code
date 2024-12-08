@@ -176,9 +176,9 @@ class TextMap:
         """Return the map as a string."""
         return self._map_string
 
-    def is_out_of_bounds(self, x: int, y: int) -> bool:
+    def within_bounds(self, x: int, y: int) -> bool:
         """
-        Check if the coordinates are outside the map.
+        Check if the coordinates are inside the map.
 
         Parameters
         ----------
@@ -192,4 +192,4 @@ class TextMap:
         bool
             True if the coordinates are outside the map, False otherwise.
         """
-        return not (0 <= x < self._n_columns and 0 <= y < self._n_rows)
+        return  0 <= x < self._n_columns and 0 <= y < self._n_rows

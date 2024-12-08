@@ -1,0 +1,188 @@
+use std::cmp::min;
+
+const INPUT_DATA: &str = include_str!("../../../data/13_mirrors.txt");
+// const INPUT_DATA: &str = "\
+// #.##..##.
+// ..#.##.#.
+// ##......#
+// ##......#
+// ..#.##.#.
+// ..##..##.
+// #.#.##.#.
+//
+// #...##..#
+// #....#..#
+// ..##..###
+// #####.##.
+// #####.##.
+// ..##..###
+// #....#..#
+// ";
+//
+#[derive(Debug)]
+struct Mirror {
+    data: String,
+}
+
+impl Mirror {
+    fn new(data: &str) -> Self {
+        Self {
+            data: data.to_string(),
+        }
+    }
+
+    fn rows(&self) -> Vec<String> {
+        self.data.lines().map(|s| s.to_string()).collect()
+    }
+
+    fn cols(&self) -> Vec<String> {
+        let rows = self.rows();
+        if rows.is_empty() {
+            return vec![];
+        }
+
+        (0..rows[0].len())
+            .map(|i| {
+                rows.iter()
+                    .map(|s| s.chars().nth(i).unwrap_or(' '))
+                    .collect()
+            })
+            .collect()
+    }
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
+enum Direction {
+    Horizontal,
+    Vertical,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct Reflection {
+    first: usize,
+    // second: usize,
+    direction: Direction,
+}
+
+impl Reflection {
+    fn score(&self) -> usize {
+        if self.direction == Direction::Horizontal {
+            (self.first + 1) * 100
+        } else {
+            self.first + 1
+        }
+    }
+    fn is_equal(&self, other: &Reflection) -> bool {
+        self.first == other.first && self.direction == other.direction
+    }
+}
+
+fn find_neighbors(lines: Vec<String>) -> Option<(usize, usize)> {
+    let n = lines.len();
+    for ix in 0..n - 1 {
+        if lines[ix] == lines[ix + 1] {
+            let backwards_n = min(ix, n - ix - 2);
+            let mut is_ok = true;
+
+            for ix2 in 1..backwards_n + 1 {
+                // boundaries are not inclusive
+                if lines[ix - ix2] != lines[ix + ix2 + 1] {
+                    is_ok = false;
+                    break;
+                }
+            }
+            if is_ok {
+                return Some((ix, ix + 1));
+            }
+        }
+    }
+    None
+}
+
+fn find_reflection_in_mirror(mirror: &Mirror) -> Option<Reflection> {
+    // first try to find a horizontal reflection
+    if let Some((start, _)) = find_neighbors(mirror.rows().to_vec()) {
+        return Some(Reflection {
+            first: start,
+            // second: end,
+            direction: Direction::Horizontal,
+        });
+    }
+
+    // then try to find a vertical reflection
+    if let Some((start, _)) = find_neighbors(mirror.cols().to_vec()) {
+        return Some(Reflection {
+            first: start,
+            // second: end,
+            direction: Direction::Vertical,
+        });
+    }
+
+    None
+}
+
+fn generate_smudge_options(input: &str) -> Vec<Mirror> {
+    let mut smudge_options = Vec::<Mirror>::new();
+
+    for (i, c) in input.chars().enumerate() {
+        if c == '#' || c == '.' {
+            // Create a new string with the character at position i flipped
+            let mut new_str = input[0..i].to_string(); // Take the substring before the character to flip
+            new_str.push(if c == '#' { '.' } else { '#' }); // Flip the character
+            new_str.push_str(&input[i + 1..]); // Append the rest of the string after the flipped character
+
+            smudge_options.push(Mirror::new(&new_str));
+        }
+    }
+
+    smudge_options
+}
+
+fn get_smudge_results(mirror: &Mirror) -> Reflection {
+    let smudge_options = generate_smudge_options(&mirror.data);
+
+    let reflections: Vec<Reflection> = smudge_options
+        .iter()
+        .filter_map(find_reflection_in_mirror)
+        .collect();
+
+    let original_reflection = find_reflection_in_mirror(&mirror).unwrap();
+
+    let filtered_reflections: Vec<&Reflection> = reflections
+        .iter()
+        .filter(|r| !r.is_equal(&original_reflection))
+        .collect();
+
+    if filtered_reflections.len() > 1 {
+        println!(
+            "Found multiple reflections: {:?}",
+            filtered_reflections.len()
+        );
+    }
+
+    if filtered_reflections.is_empty() {
+        println!("No reflections found for {:?}", mirror);
+        return original_reflection;
+    }
+
+    filtered_reflections[0].clone()
+}
+
+fn main() {
+    let mirrors: Vec<Mirror> = INPUT_DATA.split("\n\n").map(Mirror::new).collect();
+
+    let reflections: Vec<Reflection> = mirrors
+        .iter()
+        .filter_map(find_reflection_in_mirror)
+        .collect();
+
+    let score = reflections.iter().map(|r| r.score()).sum::<usize>();
+
+    println!("score: {:?}", score);
+
+    let smudge_reflections: Vec<Reflection> = mirrors.iter().map(get_smudge_results).collect();
+
+    let smudge_score = smudge_reflections.iter().map(|r| r.score()).sum::<usize>();
+
+    println!("smudge score: {:?}", smudge_score);
+}

@@ -32,9 +32,14 @@ class DataFiles:
             year = int(example_file.parent.parent.name)
             day = int(example_file.stem[4:].split("_")[0])
 
-            n_files_for_day = len([f for f in example_files if f.stem.startswith(f"day_{day:02}")])
+            n_files_for_day = len([
+                f
+                for f in example_files 
+                if f.stem.startswith(f"day_{day:02}") and f.parent.parent.name == str(year)
+            ])
+
             if n_files_for_day > 1:
-                number = int(example_file.stem.split("example")[1])
+                number = int(example_file.stem.split("example_")[1])
                 example_list = self.example_files.get((year, day), {})
                 example_list[number] = example_file
                 self.example_files[(year, day)] = example_list

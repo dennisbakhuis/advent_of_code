@@ -1,4 +1,4 @@
-"""AoC 2024 - Day 9."""
+"""AoC 2024 - Day 8."""
 from itertools import combinations
 
 import aoc  # AoC helpers
@@ -22,7 +22,7 @@ def part1(textmap: aoc.TextMap) -> int:
             antinodes.update([
                 (node1[0] + ix * dx, node1[1] + ix * dy)
                 for ix in (-1, 2)
-                if not textmap.is_out_of_bounds(node1[0] + ix * dx, node1[1] + ix * dy)
+                if textmap.within_bounds(node1[0] + ix * dx, node1[1] + ix * dy)
             ])
 
     return len(antinodes)
@@ -48,7 +48,7 @@ def part2(textmap: aoc.TextMap) -> int:
             antinodes.update([
                 (node1[0] + ix * dx, node1[1] + ix * dy)
                 for ix in range(-max_width, max_width)
-                if not textmap.is_out_of_bounds(node1[0] + ix * dx, node1[1] + ix * dy)
+                if textmap.within_bounds(node1[0] + ix * dx, node1[1] + ix * dy)
             ])
 
     return len(antinodes)
