@@ -74,8 +74,9 @@ class TextMap:
         value : str
             Character to place at (x, y).
         """
-        ix = y * self._n_columns + x
-        self._map_string = self._map_string[:ix] + value + self._map_string[ix + 1:]
+        if (0 <= x < self._n_columns and 0 <= y < self._n_rows):
+            ix = y * self._n_columns + x
+            self._map_string = self._map_string[:ix] + value + self._map_string[ix + 1:]
 
     def find(self, value: str) -> tuple[int, int]:
         """
@@ -170,3 +171,25 @@ class TextMap:
                 [fill * (self._n_columns + left + right)] * bottom
 
         return TextMap(lines)
+
+    def as_string(self) -> str:
+        """Return the map as a string."""
+        return self._map_string
+
+    def is_out_of_bounds(self, x: int, y: int) -> bool:
+        """
+        Check if the coordinates are outside the map.
+
+        Parameters
+        ----------
+        x : int
+            X-coordinate (column).
+        y : int
+            Y-coordinate (row).
+
+        Returns
+        -------
+        bool
+            True if the coordinates are outside the map, False otherwise.
+        """
+        return not (0 <= x < self._n_columns and 0 <= y < self._n_rows)
