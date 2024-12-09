@@ -52,11 +52,6 @@ class Loader:
 
         return blocks
 
-    def as_2dlist(self) -> list:
-        """Load data as 2D list."""
-        with open(self.path, "r") as file:
-            return [list(line.strip()) for line in file.readlines()]
-
     def as_textmap(self) -> TextMap:
         """Load data as TextMap object."""
         return TextMap(self.as_lines())  # type: ignore

@@ -1,22 +1,23 @@
-"""Object to hold data files."""
+"""Object to hold AoC data files."""
 
 from pathlib import Path
 
 
-_BasePath = Path(__file__).parent.parent
+_RELATIVE_BASE_PATH = Path(__file__).parent.parent
 
 
 class DataFiles:
     """Object to hold data AoC files."""
 
-    def __init__(self):
+    def __init__(self, base_path: Path = _RELATIVE_BASE_PATH):
         """Initialize the object."""
+        self._base_path = base_path
         self._get_input_files()
         self._get_example_files()
 
     def _get_input_files(self):
         """Get the input files."""
-        input_files = list(_BasePath.glob("**/data/*_input.txt"))
+        input_files = list(self._base_path.glob("**/data/*_input.txt"))
         self.input_files = {}
 
         for input_file in input_files:
@@ -26,7 +27,7 @@ class DataFiles:
 
     def _get_example_files(self):
         """Get the example files."""
-        example_files = list(_BasePath.glob("**/data/*_example*.txt"))
+        example_files = list(self._base_path.glob("**/data/*_example*.txt"))
         self.example_files: dict[tuple[int, int], Path | dict[int, Path]] = {}
 
         for example_file in example_files:

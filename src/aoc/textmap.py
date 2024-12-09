@@ -13,9 +13,14 @@ class TextMap:
         map_as_lines : list of str
             Lines representing the ASCII map.
         """
-        self._n_rows = len(map_as_lines)
-        self._n_columns = len(map_as_lines[0])
-        self._map_string = "".join(map_as_lines)
+        if map_as_lines:
+            self._n_rows = len(map_as_lines)
+            self._n_columns = len(map_as_lines[0])
+            self._map_string = "".join(map_as_lines)
+        else:
+            self._n_rows = 0
+            self._n_columns = 0
+            self._map_string = ""
 
     @property
     def width(self) -> int:
@@ -27,7 +32,7 @@ class TextMap:
         """Height of the map."""
         return self._n_rows
 
-    def get(self, x: int, y: int) -> str:
+    def get(self, x: int, y: int, out_of_bounds_character: str = "") -> str:
         """
         Get the character at the given coordinates.
 
@@ -43,6 +48,12 @@ class TextMap:
         str
             Character at (x, y).
         """
+        if not self.within_bounds(x, y):
+            if out_of_bounds_character:
+                return out_of_bounds_character
+
+            raise ValueError(f"Coordinates ({x}, {y}) are out of bounds.")
+
         return self._map_string[y * self._n_columns + x]
 
     def get_many(self, coords: list[tuple[int, int]]) -> tuple[str, ...]:
@@ -124,6 +135,9 @@ class TextMap:
         list of str
             Each line of the ASCII map.
         """
+        if not self._map_string:
+            return []
+
         return [
             self._map_string[i : i + self._n_columns]
             for i in range(0, len(self._map_string), self._n_columns)
