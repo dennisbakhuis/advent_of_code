@@ -22,7 +22,7 @@ Requirements:
 Then:
 ```bash
 conda env create -f environment.yml
-conda activate aoc2024
+conda activate aoc
 
 poetry install
 ```
@@ -38,4 +38,3 @@ rustup-init
 
 cargo build
 ```
-
