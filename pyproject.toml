@@ -26,16 +26,6 @@ testpaths = ["tests/**/test_*.py"]
 addopts = ["--import-mode=importlib"]
 filterwarnings = ["ignore::DeprecationWarning"]
 
-[tool.mypy]
-exclude = ['tests/', 'src/2*/']
-ignore_missing_imports = true
-follow_imports = "silent"
-warn_redundant_casts = true
-warn_unused_ignores = true
-disallow_any_generics = false
-check_untyped_defs = true
-no_implicit_reexport = true
-
 [tool.ruff]
 line-length = 100
 indent-width = 4
@@ -54,7 +44,3 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
-
-[tool.bandit]
-exclude_dirs = ["tests", "scripts"]
-skips = ["B101", "B404", "B410"]

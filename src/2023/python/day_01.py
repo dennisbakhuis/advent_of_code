@@ -1,7 +1,12 @@
 """AoC 2023 - Day 1."""
+
 from pathlib import Path
 
 import aoc  # AoC helpers
+
+
+YEAR = 2023
+DAY = 1
 
 
 DIGIT_VALUES = {
@@ -45,8 +50,7 @@ def get_first_digit(
                         return digit
 
 
-
-def part1(input_file: Path, use_words: bool=False) -> int:
+def part1(input_file: Path, use_words: bool = False) -> int:
     """Solution day 1 part 1."""
     lines = aoc.Loader(input_file).as_lines()
 
@@ -54,7 +58,8 @@ def part1(input_file: Path, use_words: bool=False) -> int:
         int(
             get_first_digit(line, use_words=use_words)
             + get_first_digit(line, backwards=True, use_words=use_words)
-        ) for line in lines
+        )
+        for line in lines
     ]
 
     return sum(digits)
@@ -65,21 +70,33 @@ def part2(input_file: Path) -> int:
     return part1(input_file, use_words=True)
 
 
-example_file_1 = aoc.DATA.example_files[(2023, 1)][1]
-example_file_2 = aoc.DATA.example_files[(2023, 1)][2]
-input_file = aoc.DATA.input_files[(2023, 1)]
+example_file_1: Path = aoc.DATA.example_files[(YEAR, DAY)][1]
+example_file_2: Path = aoc.DATA.example_files[(YEAR, DAY)][2]
+input_file: Path = aoc.DATA.input_files[(YEAR, DAY)]
 
+ANSWER_EXAMPLE_PART_1 = 142
+ANSWER_EXAMPLE_PART_2 = 281
+ANSWER_INPUT_PART_1 = 54634
+ANSWER_INPUT_PART_2 = 53855
 
-print(f"Solution (example) part 1: {part1(example_file_1)}")
-assert part1(example_file_1) == 142
+if __name__ == "__main__":
+    title_line = f"Solutions for day {DAY} of year {YEAR}."
+    print(title_line + "\n" + "-" * len(title_line))
 
-print(f"Solution (input) part 1: {part1(input_file)}")
-assert part1(input_file) == 54634
+    # --- Part One ---
 
-# --- Part Two ---
+    print(f"Solution (example) part 1: {part1(example_file_1)}")
+    assert part1(example_file_1) == ANSWER_EXAMPLE_PART_1
 
-print(f"Solution (example) part 2: {part2(example_file_2)}")
-assert part2(example_file_2) == 281
-print(f"Solution (input) part 2: {part2(input_file)}")
+    print(f"Solution (input) part 1: {part1(input_file)}")
+    assert part1(input_file) == ANSWER_INPUT_PART_1
 
-assert part2(input_file) == 53855
+    # --- Part Two ---
+
+    print(f"Solution (example) part 2: {part2(example_file_2)}")
+    assert part2(example_file_2) == ANSWER_EXAMPLE_PART_2
+
+    print(f"Solution (input) part 2: {part2(input_file)}")
+    assert part2(input_file) == ANSWER_INPUT_PART_2
+
+    print()

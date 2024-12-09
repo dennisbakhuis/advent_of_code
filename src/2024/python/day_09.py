@@ -5,15 +5,19 @@ from pathlib import Path
 import aoc  # AoC helpers
 
 
+YEAR = 2024
+DAY = 9
+
+
 def show_blocks(blocks: list[tuple[int | None, int]]) -> None:
     """Show the blocks as string, a debug tool."""
-    full_list = [item for sublist in [[data] * size for data, size in blocks] for item in sublist]
+    full_list = [item for sublist in [[value] * size for value, size in blocks] for item in sublist]
 
     print("".join(str(x) if x is not None else "." for x in full_list))
 
 
 def part1(input_file: Path) -> int:
-    """Solution day 9 part 1."""
+    """Solution 2024 / day 10 part 1."""
     disk = aoc.Loader(input_file).as_string()
 
     # Create a list of partitions -> a simple string does not work
@@ -38,7 +42,7 @@ def part1(input_file: Path) -> int:
 
 
 def part2(input_file: Path) -> int:
-    """Solution day 9 part 2."""
+    """Solution 2024 / day 10 part 2."""
     disk = aoc.Loader(input_file).as_string()
     blocks = [(None if ix % 2 else ix // 2, int(character)) for ix, character in enumerate(disk)]
 
@@ -63,21 +67,32 @@ def part2(input_file: Path) -> int:
     return sum(ix * value for ix, value in enumerate(flat_blocks) if value)
 
 
-example_file: Path = aoc.DATA.example_files[(2024, 9)]  # type: ignore
-input_file: Path = aoc.DATA.input_files[(2024, 9)]
+example_file: Path = aoc.DATA.example_files[(YEAR, DAY)]  # type: ignore
+input_file: Path = aoc.DATA.input_files[(YEAR, DAY)]
 
-# --- Part One ---
+ANSWER_EXAMPLE_PART_1 = 1928
+ANSWER_EXAMPLE_PART_2 = 2858
+ANSWER_INPUT_PART_1 = 6283170117911
+ANSWER_INPUT_PART_2 = 6307653242596
 
-print(f"Solution (example) part 1: {part1(example_file)}")
-assert part1(example_file) == 1928
+if __name__ == "__main__":
+    title_line = f"Solutions for day {DAY} of year {YEAR}."
+    print(title_line + "\n" + "-" * len(title_line))
 
-print(f"Solution (input) part 1: {part1(input_file)}")
-assert part1(input_file) == 6283170117911
+    # --- Part One ---
 
-# --- Part Two ---
+    print(f"Solution (example) part 1: {part1(example_file)}")
+    # assert part1(example_file) == ANSWER_EXAMPLE_PART_1
 
-print(f"Solution (example) part 2: {part2(example_file)}")
-assert part2(example_file) == 2858
+    print(f"Solution (input) part 1: {part1(input_file)}")
+    # assert part1(input_file) == ANSWER_INPUT_PART_1
 
-print(f"Solution (input) part 2: {part2(input_file)}")
-assert part2(input_file) == 6307653242596
+    # --- Part Two ---
+
+    print(f"Solution (example) part 2: {part2(example_file)}")
+    # assert part2(example_file) == ANSWER_EXAMPLE_PART_2
+
+    print(f"Solution (input) part 2: {part2(input_file)}")
+    # assert part2(input_file) == ANSWER_INPUT_PART_2
+
+    print()

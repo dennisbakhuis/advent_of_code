@@ -1,10 +1,15 @@
 """AoC 2024 - Day 7."""
+
 from pathlib import Path
 import operator
 from itertools import product
 from typing import Callable
 
 import aoc  # AoC helpers
+
+
+YEAR = 2024
+DAY = 7
 
 
 def calculate_product_of_operators(values: list[int], operators: list[Callable]) -> list[int]:
@@ -46,8 +51,7 @@ def part1(data_file: Path) -> int:
     """Find missing operators."""
     lines = aoc.Loader(data_file).as_lines()
     equations = {
-        int(line.split(":")[0]): [int(x) for x in line.split(":")[1].split()]
-        for line in lines
+        int(line.split(":")[0]): [int(x) for x in line.split(":")[1].split()] for line in lines
     }
 
     operators = (operator.add, operator.mul)
@@ -71,8 +75,7 @@ def part2(data_file: Path) -> int:
     """Find missing operators including concatenate."""
     lines = aoc.Loader(data_file).as_lines()
     equations = {
-        int(line.split(":")[0]): [int(x) for x in line.split(":")[1].split()]
-        for line in lines
+        int(line.split(":")[0]): [int(x) for x in line.split(":")[1].split()] for line in lines
     }
 
     operators = (operator.add, operator.mul, concatenate)
@@ -87,11 +90,32 @@ def part2(data_file: Path) -> int:
     return sum_of_results_has_solution
 
 
-example_file = aoc.DATA.example_files[(2024, 7)]
-input_file = aoc.DATA.input_files[(2024, 7)]
+example_file: Path = aoc.DATA.example_files[(YEAR, DAY)]  # type: ignore
+input_file: Path = aoc.DATA.input_files[(YEAR, DAY)]
 
-print(f"Solution (example) part 1: {part1(example_file)}")
-print(f"Solution (example) part 2: {part2(example_file)}")
+ANSWER_EXAMPLE_PART_1 = 3749
+ANSWER_EXAMPLE_PART_2 = 11387
+ANSWER_INPUT_PART_1 = 12940396350192
+ANSWER_INPUT_PART_2 = 106016735664498
 
-print(f"Solution (input) part 1: {part1(input_file)}")
-print(f"Solution (input) part 2: {part2(input_file)}")
+if __name__ == "__main__":
+    title_line = f"Solutions for day {DAY} of year {YEAR}."
+    print(title_line + "\n" + "-" * len(title_line))
+
+    # --- Part One ---
+
+    print(f"Solution (example) part 1: {part1(example_file)}")
+    assert part1(example_file) == ANSWER_EXAMPLE_PART_1
+
+    print(f"Solution (input) part 1: {part1(input_file)}")
+    assert part1(input_file) == ANSWER_INPUT_PART_1
+
+    # --- Part Two ---
+
+    print(f"Solution (example) part 2: {part2(example_file)}")
+    assert part2(example_file) == ANSWER_EXAMPLE_PART_2
+
+    print(f"Solution (input) part 2: {part2(input_file)}")
+    assert part2(input_file) == ANSWER_INPUT_PART_2
+
+    print()

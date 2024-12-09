@@ -1,5 +1,12 @@
 """AoC 2024 - Day 6."""
+
+from pathlib import Path
+
 import aoc  # AoC helpers
+
+
+YEAR = 2024
+DAY = 6
 
 
 def do_patrol(
@@ -56,7 +63,7 @@ def do_patrol(
     return set([p[:2] for p in locations])
 
 
-def part1(textmap: aoc.TextMap) -> int:
+def part1(file_path: Path) -> int:
     """
     Return the number of visited locations without adding new obstacles.
 
@@ -70,6 +77,8 @@ def part1(textmap: aoc.TextMap) -> int:
     int
         Number of visited locations.
     """
+    textmap = aoc.Loader(file_path).as_textmap()
+
     (cx, cy) = textmap.find("^")
     locations = do_patrol(
         location=(cx, cy, aoc.Direction.UP),
@@ -80,7 +89,7 @@ def part1(textmap: aoc.TextMap) -> int:
     return len(locations)
 
 
-def part2(textmap: aoc.TextMap) -> int:
+def part2(file_path: Path) -> int:
     """
     Return how many single added obstacles create a loop.
 
@@ -94,6 +103,8 @@ def part2(textmap: aoc.TextMap) -> int:
     int
         Count of obstacles causing a loop.
     """
+    textmap = aoc.Loader(file_path).as_textmap()
+
     (cx, cy) = textmap.find("^")
     obstacles = set(textmap.find_all("#"))
     locations = do_patrol(
@@ -107,23 +118,47 @@ def part2(textmap: aoc.TextMap) -> int:
     for location in locations:
         if location in obstacles or location == (cx, cy):
             continue
-        if do_patrol(
-            location=(cx, cy, aoc.Direction.UP),
-            obstacles=obstacles,
-            width=textmap.width,
-            height=textmap.height,
-            new_obstacle=location,
-        ) is None:
+        if (
+            do_patrol(
+                location=(cx, cy, aoc.Direction.UP),
+                obstacles=obstacles,
+                width=textmap.width,
+                height=textmap.height,
+                new_obstacle=location,
+            )
+            is None
+        ):
             creates_a_loop += 1
 
     return creates_a_loop
 
 
-example_textmap = aoc.Loader(aoc.DATA.example_files[(2024, 6)]).as_textmap()
-input_textmap = aoc.Loader(aoc.DATA.input_files[(2024, 6)]).as_textmap()
+example_file: Path = aoc.DATA.example_files[(YEAR, DAY)]  # type: ignore
+input_file: Path = aoc.DATA.input_files[(YEAR, DAY)]
 
-print(f"Solution (example) part 1: {part1(example_textmap.copy())}")
-print(f"Solution (example) part 2: {part2(example_textmap.copy())}")
+ANSWER_EXAMPLE_PART_1 = 41
+ANSWER_EXAMPLE_PART_2 = 6
+ANSWER_INPUT_PART_1 = 5177
+ANSWER_INPUT_PART_2 = 1686
 
-print(f"Solution (input) part 1: {part1(input_textmap.copy())}")
-print(f"Solution (input) part 2: {part2(input_textmap.copy())}")
+if __name__ == "__main__":
+    title_line = f"Solutions for day {DAY} of year {YEAR}."
+    print(title_line + "\n" + "-" * len(title_line))
+
+    # --- Part One ---
+
+    print(f"Solution (example) part 1: {part1(example_file)}")
+    assert part1(example_file) == ANSWER_EXAMPLE_PART_1
+
+    print(f"Solution (input) part 1: {part1(input_file)}")
+    assert part1(input_file) == ANSWER_INPUT_PART_1
+
+    # --- Part Two ---
+
+    print(f"Solution (example) part 2: {part2(example_file)}")
+    assert part2(example_file) == ANSWER_EXAMPLE_PART_2
+
+    print(f"Solution (input) part 2: {part2(input_file)}")
+    assert part2(input_file) == ANSWER_INPUT_PART_2
+
+    print()

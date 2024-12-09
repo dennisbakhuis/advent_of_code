@@ -1,8 +1,15 @@
 """AoC 2024 - Day 1."""
+
+from pathlib import Path
+
 import aoc  # AoC helpers
 
 
-def part1(lines: list[str]) -> int:
+YEAR = 2024
+DAY = 1
+
+
+def part1(file_path: Path) -> int:
     """
     Compute the sum of distances between paired numbers in a data file.
 
@@ -19,13 +26,15 @@ def part1(lines: list[str]) -> int:
     int
         The sum of distances between corresponding sorted pairs.
     """
+    lines = aoc.Loader(file_path).as_lines()
+
     left, right = zip(*(map(int, line.split()) for line in lines), strict=True)
     distance = (abs(y - x) for x, y in zip(sorted(left), sorted(right), strict=True))
 
     return sum(distance)
 
 
-def part2(lines: list[str]) -> int:
+def part2(file_path: Path) -> int:
     """
     Compute the sum of similarity scores of paired numbers in a data file.
 
@@ -38,6 +47,8 @@ def part2(lines: list[str]) -> int:
     int
         The sum of similarity scores of the numbers.
     """
+    lines = aoc.Loader(file_path).as_lines()
+
     left, right = zip(*(map(int, line.split()) for line in lines), strict=True)
 
     right_list = list(right)
@@ -47,11 +58,32 @@ def part2(lines: list[str]) -> int:
     return sum(similarity)
 
 
-lines_example = aoc.Loader(aoc.DATA.example_files[(2024, 1)]).as_lines()
-lines_input = aoc.Loader(aoc.DATA.input_files[(2024, 1)]).as_lines()
+example_file: Path = aoc.DATA.example_files[(YEAR, DAY)]  # type: ignore
+input_file: Path = aoc.DATA.input_files[(YEAR, DAY)]
 
-print(f"Solution part 1: {part1(lines_example)}")
-print(f"Solution part 2: {part2(lines_example)}")
+ANSWER_EXAMPLE_PART_1 = 11
+ANSWER_EXAMPLE_PART_2 = 31
+ANSWER_INPUT_PART_1 = 2904518
+ANSWER_INPUT_PART_2 = 18650129
 
-print(f"Solution part 1: {part1(lines_input)}")
-print(f"Solution part 2: {part2(lines_input)}")
+if __name__ == "__main__":
+    title_line = f"Solutions for day {DAY} of year {YEAR}."
+    print(title_line + "\n" + "-" * len(title_line))
+
+    # --- Part One ---
+
+    print(f"Solution (example) part 1: {part1(example_file)}")
+    # assert part1(example_file) == ANSWER_EXAMPLE_PART_1
+
+    print(f"Solution (input) part 1: {part1(input_file)}")
+    # assert part1(input_file) == ANSWER_INPUT_PART_1
+
+    # --- Part Two ---
+
+    print(f"Solution (example) part 2: {part2(example_file)}")
+    # assert part2(example_file) == ANSWER_EXAMPLE_PART_2
+
+    print(f"Solution (input) part 2: {part2(input_file)}")
+    # assert part2(input_file) == ANSWER_INPUT_PART_2
+
+    print()

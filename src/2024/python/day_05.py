@@ -1,7 +1,12 @@
 """AoC 2024 - Day 5."""
+
 from pathlib import Path
 
 import aoc  # AoC helpers
+
+
+YEAR = 2024
+DAY = 5
 
 
 def check_rule_violation(
@@ -62,6 +67,7 @@ def check_update_violates_rules(update: list[int], rules: list[tuple[int, int]])
 
     return False
 
+
 def part1(data_file: Path) -> int:
     """
     Find middle pages of correct updates.
@@ -73,15 +79,9 @@ def part1(data_file: Path) -> int:
     """
     rules_raw, updates_raw = aoc.Loader(data_file).as_lines(multiple_parts=True)
 
-    rules = [
-        tuple(map(int, rule.split("|")))
-        for rule in rules_raw
-    ]
+    rules = [tuple(map(int, rule.split("|"))) for rule in rules_raw]
 
-    updates = [
-        list(map(int, update.split(",")))
-        for update in updates_raw
-    ]
+    updates = [list(map(int, update.split(","))) for update in updates_raw]
 
     correct_updates = []
     for update in updates:
@@ -104,15 +104,9 @@ def part2(data_file: Path) -> int:
     """
     rules_raw, updates_raw = aoc.Loader(data_file).as_lines(multiple_parts=True)
 
-    rules = [
-        tuple(map(int, rule.split("|")))
-        for rule in rules_raw
-    ]
+    rules = [tuple(map(int, rule.split("|"))) for rule in rules_raw]
 
-    updates = [
-        tuple(map(int, update.split(",")))
-        for update in updates_raw
-    ]
+    updates = [tuple(map(int, update.split(","))) for update in updates_raw]
 
     incorrect_updates = []
     for update in updates:
@@ -123,17 +117,16 @@ def part2(data_file: Path) -> int:
     for update in incorrect_updates:
         current_update = list(update)
 
-        applicable_rules = [
-            rule
-            for rule in rules
-            if rule[0] in update and rule[1] in update
-        ]
+        applicable_rules = [rule for rule in rules if rule[0] in update and rule[1] in update]
 
         while check_update_violates_rules(current_update, applicable_rules):
             for rule in applicable_rules:
                 violates, left_ix, right_ix = check_rule_violation(current_update, rule)
                 if violates:
-                    current_update[left_ix], current_update[right_ix] = current_update[right_ix], current_update[left_ix]
+                    current_update[left_ix], current_update[right_ix] = (
+                        current_update[right_ix],
+                        current_update[left_ix],
+                    )
 
         fixed_updates.append(current_update)
 
@@ -142,11 +135,32 @@ def part2(data_file: Path) -> int:
     return sum(middle_page_numbers)
 
 
-example_file = aoc.DATA.example_files[(2024, 5)]
-input_file = aoc.DATA.input_files[(2024, 5)]
+example_file: Path = aoc.DATA.example_files[(YEAR, DAY)]  # type: ignore
+input_file: Path = aoc.DATA.input_files[(YEAR, DAY)]
 
-print(f"Solution part 1: {part1(example_file)}")
-print(f"Solution part 1: {part1(input_file)}")
+ANSWER_EXAMPLE_PART_1 = 143
+ANSWER_EXAMPLE_PART_2 = 123
+ANSWER_INPUT_PART_1 = 5087
+ANSWER_INPUT_PART_2 = 4971
 
-print(f"Solution part 2: {part2(example_file)}")
-print(f"Solution part 2: {part2(input_file)}")
+if __name__ == "__main__":
+    title_line = f"Solutions for day {DAY} of year {YEAR}."
+    print(title_line + "\n" + "-" * len(title_line))
+
+    # --- Part One ---
+
+    print(f"Solution (example) part 1: {part1(example_file)}")
+    assert part1(example_file) == ANSWER_EXAMPLE_PART_1
+
+    print(f"Solution (input) part 1: {part1(input_file)}")
+    assert part1(input_file) == ANSWER_INPUT_PART_1
+
+    # --- Part Two ---
+
+    print(f"Solution (example) part 2: {part2(example_file)}")
+    assert part2(example_file) == ANSWER_EXAMPLE_PART_2
+
+    print(f"Solution (input) part 2: {part2(input_file)}")
+    assert part2(input_file) == ANSWER_INPUT_PART_2
+
+    print()

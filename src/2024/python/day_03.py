@@ -1,8 +1,13 @@
 """AoC 2024 - Day 3."""
+
 from pathlib import Path
 import re
 
 import aoc  # AoC helpers
+
+
+YEAR = 2024
+DAY = 3
 
 
 def part1(data_file: Path) -> int:
@@ -62,12 +67,33 @@ def part2(data_file: Path) -> int:
     return sum(products)
 
 
-example_file_1 = aoc.DATA.example_files[(2024, 3)][1]
-example_file_2 = aoc.DATA.example_files[(2024, 3)][2]
-input_file = aoc.DATA.input_files[(2024, 3)]
+example_file_1: Path = aoc.DATA.example_files[(YEAR, DAY)][1]
+example_file_2: Path = aoc.DATA.example_files[(YEAR, DAY)][2]
+input_file: Path = aoc.DATA.input_files[(YEAR, DAY)]
 
-print(f"Solution part 1: {part1(example_file_1)}")
-print(f"Solution part 2: {part2(example_file_2)}")
+ANSWER_EXAMPLE_PART_1 = 161
+ANSWER_EXAMPLE_PART_2 = 48
+ANSWER_INPUT_PART_1 = 178886550
+ANSWER_INPUT_PART_2 = 87163705
 
-print(f"Solution part 1: {part1(input_file)}")
-print(f"Solution part 2: {part2(input_file)}")
+if __name__ == "__main__":
+    title_line = f"Solutions for day {DAY} of year {YEAR}."
+    print(title_line + "\n" + "-" * len(title_line))
+
+    # --- Part One ---
+
+    print(f"Solution (example) part 1: {part1(example_file_1)}")
+    assert part1(example_file_1) == ANSWER_EXAMPLE_PART_1
+
+    print(f"Solution (input) part 1: {part1(input_file)}")
+    assert part1(input_file) == ANSWER_INPUT_PART_1
+
+    # --- Part Two ---
+
+    print(f"Solution (example) part 2: {part2(example_file_2)}")
+    assert part2(example_file_2) == ANSWER_EXAMPLE_PART_2
+
+    print(f"Solution (input) part 2: {part2(input_file)}")
+    assert part2(input_file) == ANSWER_INPUT_PART_2
+
+    print()

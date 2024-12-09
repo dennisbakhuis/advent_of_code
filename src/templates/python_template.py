@@ -1,41 +1,54 @@
 """AoC "'YEAR'" - Day "'DAY'"."""
+
 from pathlib import Path
 
 import aoc  # AoC helpers
 
 
+YEAR = "'YEAR'"
+DAY = "'DAY'"
+
+
 def part1(input_file: Path) -> int:
-    """Solution day "'DAY'" part 1."""
+    """Solution "'YEAR'" / day "'DAY'" part 1."""
     pass
     return 0
 
 
 def part2(input_file: Path) -> int:
-    """Solution day "'DAY'" part 2."""
+    """Solution "'YEAR'" / day "'DAY'" part 2."""
     pass
     return 0
 
 
-example_textmap = aoc.Loader(aoc.DATA.example_files[("'YEAR'", "'DAY'")]).as_textmap()
-input_textmap = aoc.Loader(aoc.DATA.input_files[("'YEAR'", "'DAY'")]).as_textmap()
+example_file: Path = aoc.DATA.example_files[(YEAR, DAY)]  # type: ignore
+# example_file_1: Path = aoc.DATA.example_files[(YEAR, DAY)][1]
+# example_file_2: Path = aoc.DATA.example_files[(YEAR, DAY)][2]
+input_file: Path = aoc.DATA.input_files[(YEAR, DAY)]
 
-example_file = aoc.DATA.example_files[("'YEAR'", "'DAY'")]
-# example_file_1 = aoc.DATA.example_files[("'YEAR'", "'DAY'")][1]
-# example_file_2 = aoc.DATA.example_files[("'YEAR'", "'DAY'")][2]
-input_file = aoc.DATA.input_files[("'YEAR'", "'DAY'")]
+ANSWER_EXAMPLE_PART_1 = None
+ANSWER_EXAMPLE_PART_2 = None
+ANSWER_INPUT_PART_1 = None
+ANSWER_INPUT_PART_2 = None
 
+if __name__ == "__main__":
+    title_line = f"Solutions for day {DAY} of year {YEAR}."
+    print(title_line + "\n" + "-" * len(title_line))
 
-print(f"Solution (example) part 1: {part1(example_file)}")
-# print(f"Solution (example) part 1: {part1(example_file_1)}")
-# assert part1(example_file) == None
+    # --- Part One ---
 
-# print(f"Solution (input) part 1: {part1(input_file)}")
-# assert part1(input_file) == None
+    print(f"Solution (example) part 1: {part1(example_file)}")
+    assert part1(example_file) == ANSWER_EXAMPLE_PART_1
 
-# --- Part Two ---
+    # print(f"Solution (input) part 1: {part1(input_file)}")
+    # assert part1(input_file) == ANSWER_INPUT_PART_1
 
-# print(f"Solution (example) part 2: {part2(example_file)}")
-# assert part2(example_textmap.copy()) == None
+    # # --- Part Two ---
 
-# print(f"Solution (input) part 2: {part2(input_file)}")
-# assert part2(input_file) == None
+    # print(f"Solution (example) part 2: {part2(example_file)}")
+    # assert part2(example_file) == ANSWER_EXAMPLE_PART_2
+
+    # print(f"Solution (input) part 2: {part2(input_file)}")
+    # assert part2(input_file) == ANSWER_INPUT_PART_2
+
+    print()
