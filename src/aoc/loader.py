@@ -15,7 +15,7 @@ class Loader:
     def as_string(self) -> str:
         """Load data as string."""
         with open(self.path, "r") as file:
-            return file.read()
+            return file.read().strip()
 
     def as_lines(self, multiple_parts: bool = False) -> list[str] | list[list[str]]:
         """

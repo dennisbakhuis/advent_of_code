@@ -27,7 +27,7 @@ addopts = ["--import-mode=importlib"]
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.mypy]
-exclude = ['tests/']
+exclude = ['tests/', 'src/2*/']
 ignore_missing_imports = true
 follow_imports = "silent"
 warn_redundant_casts = true
