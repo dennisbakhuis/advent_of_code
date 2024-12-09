@@ -2,17 +2,16 @@
 
 from .loader import Loader
 from .data_files import DataFiles
-from .direction import Direction
 from .textmap import TextMap
-
+from . import grid
 
 DATA = DataFiles()
 
 
 __all__ = [
-    "Loader",
-    "DataFiles",
-    "Direction",
-    "TextMap",
     "DATA",
+    "DataFiles",
+    "grid",
+    "Loader",
+    "TextMap",
 ]

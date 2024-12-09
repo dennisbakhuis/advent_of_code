@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import aoc  # AoC helpers
+from aoc.grid import Direction
 
 
 YEAR = 2024
@@ -10,7 +11,7 @@ DAY = 6
 
 
 def do_patrol(
-    location: tuple[int, int, aoc.Direction],
+    location: tuple[int, int, Direction],
     obstacles: set[tuple[int, int]],
     width: int,
     height: int,
@@ -21,7 +22,7 @@ def do_patrol(
 
     Parameters
     ----------
-    location : tuple[int, int, aoc.Direction]
+    location : tuple[int, int, aoc.grid.Direction]
         Starting position and direction.
     obstacles : set[tuple[int, int]]
         Obstacle locations.
@@ -49,10 +50,10 @@ def do_patrol(
             return None
 
         if (
-            (direction == aoc.Direction.UP and (x, y - 1) in obstacle_list)
-            or (direction == aoc.Direction.RIGHT and (x + 1, y) in obstacle_list)
-            or (direction == aoc.Direction.DOWN and (x, y + 1) in obstacle_list)
-            or (direction == aoc.Direction.LEFT and (x - 1, y) in obstacle_list)
+            (direction == Direction.UP and (x, y - 1) in obstacle_list)
+            or (direction == Direction.RIGHT and (x + 1, y) in obstacle_list)
+            or (direction == Direction.DOWN and (x, y + 1) in obstacle_list)
+            or (direction == Direction.LEFT and (x - 1, y) in obstacle_list)
         ):
             direction = direction.turn_right()
             continue
@@ -81,7 +82,7 @@ def part1(file_path: Path) -> int:
 
     (cx, cy) = textmap.find("^")
     locations = do_patrol(
-        location=(cx, cy, aoc.Direction.UP),
+        location=(cx, cy, Direction.UP),
         obstacles=set(textmap.find_all("#")),
         width=textmap.width,
         height=textmap.height,
@@ -108,7 +109,7 @@ def part2(file_path: Path) -> int:
     (cx, cy) = textmap.find("^")
     obstacles = set(textmap.find_all("#"))
     locations = do_patrol(
-        location=(cx, cy, aoc.Direction.UP),
+        location=(cx, cy, Direction.UP),
         obstacles=obstacles,
         width=textmap.width,
         height=textmap.height,
@@ -120,7 +121,7 @@ def part2(file_path: Path) -> int:
             continue
         if (
             do_patrol(
-                location=(cx, cy, aoc.Direction.UP),
+                location=(cx, cy, Direction.UP),
                 obstacles=obstacles,
                 width=textmap.width,
                 height=textmap.height,

@@ -2,7 +2,7 @@
 
 import pytest
 
-from aoc import Direction
+from aoc.grid import Direction
 
 
 def test_turn_left():

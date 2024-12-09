@@ -1,22 +1,35 @@
 """Module for working with ASCII maps."""
 
+import re
+from typing import Iterable
+
+from .grid import within_bounds
+
 
 class TextMap:
     """Holds and manipulates an ASCII map."""
 
-    def __init__(self, map_as_lines: list[str]) -> None:
+    def __init__(self, map_as_lines: list[str], padding_char: str = " ") -> None:
         """
         Initialize the map from a list of strings.
+
+        Ensure that all lines are of equal length
+        by padding shorter lines with the specified padding character.
 
         Parameters
         ----------
         map_as_lines : list of str
             Lines representing the ASCII map.
+        padding_char : str, optional
+            Character to use for padding shorter lines (default is space).
         """
         if map_as_lines:
             self._n_rows = len(map_as_lines)
-            self._n_columns = len(map_as_lines[0])
-            self._map_string = "".join(map_as_lines)
+            self._n_columns = max(len(line) for line in map_as_lines)
+
+            # Pad each line to the maximum length with the padding character
+            padded_lines = [line.ljust(self._n_columns, padding_char) for line in map_as_lines]
+            self._map_string = "".join(padded_lines)
         else:
             self._n_rows = 0
             self._n_columns = 0
@@ -32,37 +45,57 @@ class TextMap:
         """Height of the map."""
         return self._n_rows
 
-    def get(self, x: int, y: int, out_of_bounds_character: str = "") -> str:
+    @property
+    def bounds(self) -> tuple[int, int, int, int]:
+        """Bounds of the map as (min_x, min_y, max_x, max_y)."""
+        return 0, 0, self._n_columns - 1, self._n_rows - 1
+
+    def get(
+        self, x: int | tuple[int, int], y: int = None, out_of_bounds_character: str = ""
+    ) -> str:
         """
         Get the character at the given coordinates.
 
         Parameters
         ----------
-        x : int
-            X-coordinate (column).
-        y : int
-            Y-coordinate (row).
+        x : Union[int, Tuple[int, int]]
+            X-coordinate (column) as an integer or a tuple containing (x, y).
+        y : int, optional
+            Y-coordinate (row). Required if `x` is an integer.
+        out_of_bounds_character : str, optional
+            Character to return if coordinates are out of bounds. Defaults to "".
 
         Returns
         -------
         str
-            Character at (x, y).
+            Character at the specified coordinates.
+
+        Raises
+        ------
+        TypeError
+            If `x` is a tuple and `y` is also provided, or if `x` is an integer and `y` is not provided.
+        ValueError
+            If the coordinates are out of bounds and no `out_of_bounds_character` is provided.
         """
-        if not self.within_bounds(x, y):
+        if isinstance(x, tuple):
+            x, y = x
+
+        if not self.within_bounds((x, y)):
             if out_of_bounds_character:
                 return out_of_bounds_character
-
             raise ValueError(f"Coordinates ({x}, {y}) are out of bounds.")
 
         return self._map_string[y * self._n_columns + x]
 
-    def get_many(self, coords: list[tuple[int, int]]) -> tuple[str, ...]:
+    def get_many(
+        self, coordinates: Iterable[tuple[int, int]], out_of_bounds_character: str = ""
+    ) -> tuple[str, ...]:
         """
         Get characters at the given coordinates.
 
         Parameters
         ----------
-        coords : list of (x, y)
+        coordinates : list of (x, y)
             Coordinates to fetch.
 
         Returns
@@ -70,7 +103,9 @@ class TextMap:
         tuple of str
             Characters at the given coordinates.
         """
-        return tuple(self._map_string[y * self._n_columns + x] for x, y in coords)
+        return tuple(
+            self.get(x, y, out_of_bounds_character=out_of_bounds_character) for x, y in coordinates
+        )
 
     def set(self, x: int, y: int, value: str) -> None:
         """
@@ -200,7 +235,7 @@ class TextMap:
         """Return the map as a string."""
         return self._map_string
 
-    def within_bounds(self, x: int, y: int) -> bool:
+    def within_bounds(self, coordinates: tuple[int, int] | Iterable[tuple[int, int]]) -> bool:
         """
         Check if the coordinates are inside the map.
 
@@ -216,4 +251,35 @@ class TextMap:
         bool
             True if the coordinates are outside the map, False otherwise.
         """
-        return 0 <= x < self._n_columns and 0 <= y < self._n_rows
+        return within_bounds(coordinates, self.bounds)
+
+    def find_horizontal_numbers(self) -> list[tuple[int, tuple[int, int], tuple[int, int]]]:
+        """
+        Identify and locate all horizontal numbers (sequences of consecutive digits) in the ASCII map.
+
+        Returns
+        -------
+        list of tuple[int, tuple[int, int], tuple[int, int]]
+            A list where each dictionary contains:
+                - 'number' (int): The numeric value of the sequence.
+                - 'start' (tuple of int): The starting position as (row, column).
+                - 'end' (tuple of int): The ending position as (row, column).
+        """
+        horizontal_numbers = []
+        lines = self.as_lines()
+
+        for row_idx, line in enumerate(lines):
+            for match in re.finditer(r"\d+", line):
+                number_str = match.group()
+                start_col = match.start()
+                end_col = match.end() - 1  # inclusive end index
+                number = int(number_str)
+                horizontal_numbers.append(
+                    (
+                        number,
+                        (start_col, row_idx),
+                        (end_col, row_idx),
+                    )
+                )
+
+        return horizontal_numbers

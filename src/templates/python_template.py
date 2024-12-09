@@ -26,10 +26,10 @@ example_file: Path = aoc.DATA.example_files[(YEAR, DAY)]  # type: ignore
 # example_file_2: Path = aoc.DATA.example_files[(YEAR, DAY)][2]
 input_file: Path = aoc.DATA.input_files[(YEAR, DAY)]
 
-ANSWER_EXAMPLE_PART_1 = None
-ANSWER_EXAMPLE_PART_2 = None
-ANSWER_INPUT_PART_1 = None
-ANSWER_INPUT_PART_2 = None
+ANSWER_EXAMPLE_PART_1 = 0
+ANSWER_EXAMPLE_PART_2 = 0
+ANSWER_INPUT_PART_1 = 0
+ANSWER_INPUT_PART_2 = 0
 
 if __name__ == "__main__":
     title_line = f"Solutions for day {DAY} of year {YEAR}."

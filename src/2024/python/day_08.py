@@ -28,7 +28,7 @@ def part1(file_path: Path) -> int:
                 [
                     (node1[0] + ix * dx, node1[1] + ix * dy)
                     for ix in (-1, 2)
-                    if textmap.within_bounds(node1[0] + ix * dx, node1[1] + ix * dy)
+                    if textmap.within_bounds((node1[0] + ix * dx, node1[1] + ix * dy))
                 ]
             )
 
@@ -55,7 +55,7 @@ def part2(file_path: Path) -> int:
                 [
                     (node1[0] + ix * dx, node1[1] + ix * dy)
                     for ix in range(-max_width, max_width)
-                    if textmap.within_bounds(node1[0] + ix * dx, node1[1] + ix * dy)
+                    if textmap.within_bounds((node1[0] + ix * dx, node1[1] + ix * dy))
                 ]
             )
 
