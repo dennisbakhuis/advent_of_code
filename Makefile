@@ -25,7 +25,6 @@ endif
 
 $(YEAR): $(DAY)
 	mkdir -p $(dir $(OUTPUT))
-	python3 $(GENERATE_SCRIPT) $(TEMPLATE) $(OUTPUT) $(YEAR) $(DAY)
-
+	test -f $(OUTPUT) || python3 $(GENERATE_SCRIPT) $(TEMPLATE) $(OUTPUT) $(YEAR) $(DAY)
 test:
 	pytest --cov-report term-missing --cov=src/aoc
