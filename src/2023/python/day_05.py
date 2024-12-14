@@ -12,7 +12,7 @@ DAY = 5
 
 def parse_seeds_and_mappings(input_file: Path) -> tuple[tuple[int], tuple[tuple[tuple[int]]]]:
     """Parse the seeds and mappings from the input file."""
-    parts = aoc.Loader(input_file).as_lines(multiple_parts=True)
+    parts = aoc.Loader(input_file).as_multiple_parts_of_lines()
 
     seeds = tuple(int(value) for value in parts[0][0].split(":")[1].split())
     mappings = tuple(

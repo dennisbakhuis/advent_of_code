@@ -77,7 +77,7 @@ def part1(data_file: Path) -> int:
     data_file : pathlib.Path
         Path to the file containing pairs of integers.
     """
-    rules_raw, updates_raw = aoc.Loader(data_file).as_lines(multiple_parts=True)
+    rules_raw, updates_raw = aoc.Loader(data_file).as_multiple_parts_of_lines()
 
     rules = [tuple(map(int, rule.split("|"))) for rule in rules_raw]
 
@@ -102,7 +102,7 @@ def part2(data_file: Path) -> int:
     data_file : pathlib.Path
         Path to the file containing pairs of integers.
     """
-    rules_raw, updates_raw = aoc.Loader(data_file).as_lines(multiple_parts=True)
+    rules_raw, updates_raw = aoc.Loader(data_file).as_multiple_parts_of_lines()
 
     rules = [tuple(map(int, rule.split("|"))) for rule in rules_raw]
 

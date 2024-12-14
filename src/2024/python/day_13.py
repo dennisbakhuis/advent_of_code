@@ -12,7 +12,7 @@ DAY = 13
 
 def part1(input_file: Path) -> int:
     """Solution 2024 / day 13 part 1."""
-    claw_machines = aoc.Loader(input_file).as_lines(multiple_parts=True)
+    claw_machines = aoc.Loader(input_file).as_multiple_parts_of_lines()
 
     token_costs = (3, 1)
 
@@ -37,7 +37,7 @@ def part1(input_file: Path) -> int:
 
 def part2(input_file: Path) -> int:
     """Solution 2024 / day 13 part 2."""
-    claw_machines = aoc.Loader(input_file).as_lines(multiple_parts=True)
+    claw_machines = aoc.Loader(input_file).as_multiple_parts_of_lines()
 
     token_costs = (3, 1)
     offset = 10_000_000_000_000

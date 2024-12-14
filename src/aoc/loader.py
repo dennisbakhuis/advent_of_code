@@ -1,8 +1,12 @@
 """Data loader class."""
 
 from pathlib import Path
+import re
 
 from .textmap import TextMap
+
+
+REGEX_ALL_NUMBERS = re.compile(r"-?\d+")
 
 
 class Loader:
@@ -17,27 +21,17 @@ class Loader:
         with open(self.path, "r") as file:
             return file.read().strip()
 
-    def as_lines(self, multiple_parts: bool = False) -> list[str] | list[list[str]]:
-        """
-        Load data as a list of lines.
+    def as_lines(self) -> list[str]:
+        """Load data as a list of lines."""
+        with open(self.path, "r") as file:
+            lines = [line.strip() for line in file.readlines() if line.strip()]
 
-        Parameters
-        ----------
-        multiple_parts : bool, optional
-            If True, return a list of lists, where each inner list represents a
-            block of lines separated by one or more empty lines. If False, return
-            a flat list of all non-empty lines.
+        return lines
 
-        Returns
-        -------
-        list[str] | list[list[str]]
-            A list of lines (if multiple_parts=False) or a list of lists of lines (if multiple_parts=True).
-        """
+    def as_multiple_parts_of_lines(self) -> list[list[str]]:
+        """Load data as a list of lists of lines which are separated by a blank line."""
         with open(self.path, "r") as file:
             lines = [line.strip() for line in file.readlines()]
-
-        if not multiple_parts:
-            return [line for line in lines if line]
 
         blocks, current_block = [], []
         for line in lines:
@@ -51,6 +45,10 @@ class Loader:
             blocks.append(current_block)
 
         return blocks
+
+    def as_list_of_integers(self) -> tuple[tuple[int, ...]]:
+        """Load data as a tuple of tuples of integers."""
+        return tuple(tuple(map(int, REGEX_ALL_NUMBERS.findall(line))) for line in self.as_lines())
 
     def as_textmap(self) -> TextMap:
         """Load data as TextMap object."""

@@ -35,6 +35,47 @@ class TextMap:
             self._n_columns = 0
             self._map_string = ""
 
+    @classmethod
+    def from_string(cls, map_string: str) -> "TextMap":
+        """
+        Create a TextMap from a string.
+
+        Parameters
+        ----------
+        map_string : str
+            ASCII map as a single string.
+
+        Returns
+        -------
+        TextMap
+            A new map object.
+        """
+        return cls(map_string.splitlines())
+
+    @classmethod
+    def empty(cls, width: int, height: int, fill: str = " ") -> "TextMap":
+        """
+        Create an empty map with the specified dimensions.
+
+        Parameters
+        ----------
+        width : int
+            Width of the map.
+        height : int
+            Height of the map.
+        fill : str, optional
+            Character to fill the map with (default is space).
+
+        Returns
+        -------
+        TextMap
+            A new map object.
+        """
+        if width <= 0 or height <= 0:
+            raise ValueError("Width and height must be positive integers.")
+
+        return cls([fill * width for _ in range(height)])
+
     @property
     def width(self) -> int:
         """Width of the map."""
@@ -123,6 +164,20 @@ class TextMap:
         if 0 <= x < self._n_columns and 0 <= y < self._n_rows:
             ix = y * self._n_columns + x
             self._map_string = self._map_string[:ix] + value + self._map_string[ix + 1 :]
+
+    def set_many(self, coordinates: Iterable[tuple[int, int]], value: str) -> None:
+        """
+        Set the character at the given coordinates.
+
+        Parameters
+        ----------
+        coordinates : list of (x, y)
+            Coordinates to set.
+        value : str
+            Character to place at the coordinates.
+        """
+        for x, y in coordinates:
+            self.set(x, y, value)
 
     def find(self, value: str) -> tuple[int, int]:
         """

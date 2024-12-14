@@ -3,6 +3,7 @@
 from .count_corners import count_corners
 from .direction import Direction
 from .find_holes import find_holes
+from .find_lines import find_lines
 from .get_coordinates_from_line import get_coordinates_from_line
 from .group_adjacent import group_adjacent
 from .is_adjacent import is_adjacent
@@ -16,6 +17,7 @@ __all__ = [
     "count_corners",
     "Direction",
     "find_holes",
+    "find_lines",
     "get_coordinates_from_line",
     "group_adjacent",
     "is_adjacent",

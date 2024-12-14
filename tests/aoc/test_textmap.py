@@ -32,6 +32,73 @@ def tm(sample_map):
     return TextMap(sample_map)
 
 
+@pytest.fixture
+def large_map():
+    """
+    Create a large 100x100 TextMap filled with '.' characters.
+
+    Returns
+    -------
+    TextMap
+        A large TextMap instance for testing.
+    """
+    width, height = 100, 100
+    lines = ["." * width for _ in range(height)]
+    return TextMap(lines)
+
+
+@pytest.fixture
+def uneven_map_string():
+    """
+    Create a string representing an ASCII map with uneven line lengths.
+
+    Returns
+    -------
+    str
+        An ASCII map string with lines of varying lengths.
+    """
+    return "ABCDE\nFGH\nIJKL"
+
+
+@pytest.fixture
+def single_line_map_string():
+    """
+    Create a string representing an ASCII map with a single line.
+
+    Returns
+    -------
+    str
+        An ASCII map string with a single line.
+    """
+    return "ONLYONELINE"
+
+
+@pytest.fixture
+def empty_map_string():
+    """
+    Create an empty string for testing from_string with no content.
+
+    Returns
+    -------
+    str
+        An empty string.
+    """
+    return ""
+
+
+@pytest.fixture
+def map_string_with_unicode():
+    """
+    Create a string representing an ASCII map with Unicode characters.
+
+    Returns
+    -------
+    str
+        An ASCII map string containing Unicode characters.
+    """
+    return "A😊C\nD😊F\nG😊I"
+
+
 def test_init(tm, sample_map):
     """
     Test TextMap initialization.
@@ -492,3 +559,211 @@ def test_find_horizontal_numbers_multiple_numbers_per_line():
         (56, (8, 0), (9, 0)),  # "56" starts at index 8 and ends at index 9 in row 0
     ]
     assert tm.find_horizontal_numbers() == expected
+
+
+def test_set_many_normal(tm):
+    """Test setting multiple in-bounds coordinates."""
+    coordinates = [(0, 0), (1, 1), (2, 2)]
+    tm.set_many(coordinates, "Z")
+    expected_lines = ["ZBC", "DZF", "GHZ"]
+    assert tm.as_lines() == expected_lines
+
+
+def test_set_many_with_out_of_bounds(tm):
+    """Test setting coordinates where some are out of bounds."""
+    coordinates = [(-1, 0), (0, -1), (1, 1), (3, 3)]
+    tm.set_many(coordinates, "X")
+    expected_lines = ["ABC", "DXF", "GHI"]
+    assert tm.as_lines() == expected_lines  # Only (1,1) is in bounds
+
+
+def test_set_many_empty_coordinates(tm):
+    """Test setting with an empty coordinates iterable."""
+    coordinates = []
+    tm.set_many(coordinates, "X")
+    # Map should remain unchanged
+    expected_lines = ["ABC", "DEF", "GHI"]
+    assert tm.as_lines() == expected_lines
+
+
+def test_set_many_overlapping_coordinates(tm):
+    """Test setting the same coordinate multiple times."""
+    coordinates = [(1, 1), (1, 1), (1, 1)]
+    tm.set_many(coordinates, "Z")
+    expected_lines = ["ABC", "DZF", "GHI"]
+    assert tm.as_lines() == expected_lines  # Last 'Z' applied
+
+
+def test_set_many_different_iterables(tm, sample_map):
+    """Test set_many with different types of iterables."""
+    # Using a list
+    list_coords = [(0, 0), (2, 2)]
+    tm.set_many(list_coords, "L")
+    expected_lines = [
+        "LBC",
+        "DEF",
+        "GHIL",  # Note: Original map is 3x3, (2,2) is 'I' -> 'L'
+    ]
+    # Adjusted expected_lines for 3x3 map
+    expected_lines = ["LBC", "DEF", "GHL"]
+    assert tm.as_lines() == expected_lines
+
+    # Reset map
+    tm_copy = TextMap(sample_map)
+
+    # Using a set
+    set_coords = {(0, 0), (2, 2)}
+    tm_copy.set_many(set_coords, "S")
+    expected_lines_set = ["SBC", "DEF", "GHS"]
+    assert tm_copy.as_lines() == expected_lines_set
+
+    # Using a generator
+    generator_coords = ((x, y) for x, y in [(0, 0), (2, 2)])
+    tm_copy_reset = TextMap(sample_map)
+    tm_copy_reset.set_many(generator_coords, "G")
+    expected_lines_gen = ["GBC", "DEF", "GHG"]
+    assert tm_copy_reset.as_lines() == expected_lines_gen
+
+
+def test_set_many_different_values(tm):
+    """Test setting multiple coordinates with different values by calling set_many multiple times."""
+    # First set many to "X"
+    coordinates = [(0, 0), (1, 1), (2, 2)]
+    tm.set_many(coordinates, "X")
+
+    # Then set many to "Y" on some overlapping and some new coordinates
+    new_coordinates = [(1, 1), (2, 0)]
+    tm.set_many(new_coordinates, "Y")
+    expected_lines = ["XBY", "DYF", "GHX"]
+    assert tm.as_lines() == expected_lines
+
+
+def test_set_many_large_number_of_coordinates(large_map):
+    """Test set_many with a large number of coordinates."""
+    # Set every 10th character in each row to 'X'
+    coordinates = [(x, y) for y in range(large_map.height) for x in range(0, large_map.width, 10)]
+    large_map.set_many(coordinates, "X")
+
+    for y in range(large_map.height):
+        line = large_map.as_lines()[y]
+        for x in range(large_map.width):
+            if x % 10 == 0:
+                assert line[x] == "X"
+            else:
+                assert line[x] == "."
+
+
+def test_set_many_no_side_effects(tm):
+    """Ensure that only specified coordinates are modified."""
+    coordinates = [(0, 0), (2, 2)]
+    tm.set_many(coordinates, "Z")
+    expected_lines = ["ZBC", "DEF", "GHZ"]
+    assert tm.as_lines() == expected_lines
+
+
+def test_set_many_unicode_characters(tm):
+    """Test setting with Unicode characters."""
+    coordinates = [(0, 0), (1, 1)]
+    tm.set_many(coordinates, "😊")
+    expected_lines = ["😊BC", "D😊F", "GHI"]
+    assert tm.as_lines() == expected_lines
+
+
+def test_set_many_partial_overlap(tm):
+    """Test set_many with some overlapping and some non-overlapping coordinates."""
+    coordinates = [(0, 0), (1, 1), (1, 1), (2, 2)]
+    tm.set_many(coordinates, "P")
+    expected_lines = [
+        "PBC",
+        "DPF",
+        "GHPP",  # Note: Original map is 3x3, (2,2) is 'I' -> 'P'
+    ]
+    # Adjusted expected_lines for 3x3 map
+    expected_lines = ["PBC", "DPF", "GHP"]
+    assert tm.as_lines() == expected_lines
+
+
+def test_from_string_normal():
+    """Test creating TextMap from a multi-line string with equal-length lines."""
+    map_str = "ABC\nDEF\nGHI"
+    tm = TextMap.from_string(map_str)
+    expected_lines = ["ABC", "DEF", "GHI"]
+    assert tm.as_lines() == expected_lines
+    assert tm.width == 3
+    assert tm.height == 3
+
+
+def test_from_string_with_padding(uneven_map_string):
+    """Test creating TextMap from a multi-line string with uneven line lengths (padding)."""
+    tm = TextMap.from_string(uneven_map_string)
+    expected_lines = ["ABCDE", "FGH  ", "IJKL "]
+    assert tm.as_lines() == expected_lines
+    assert tm.width == 5  # Maximum line length is 5
+    assert tm.height == 3
+
+
+def test_from_string_empty(empty_map_string):
+    """Test creating TextMap from an empty string."""
+    tm = TextMap.from_string(empty_map_string)
+    expected_lines = []
+    assert tm.as_lines() == expected_lines
+    assert tm.width == 0
+    assert tm.height == 0
+
+
+def test_from_string_single_line(single_line_map_string):
+    """Test creating TextMap from a single-line string."""
+    tm = TextMap.from_string(single_line_map_string)
+    expected_lines = ["ONLYONELINE"]
+    assert tm.as_lines() == expected_lines
+    assert tm.width == len("ONLYONELINE")
+    assert tm.height == 1
+
+
+def test_from_string_with_unicode(map_string_with_unicode):
+    """Test creating TextMap from a string containing Unicode characters."""
+    tm = TextMap.from_string(map_string_with_unicode)
+    expected_lines = ["A😊C", "D😊F", "G😊I"]
+    assert tm.as_lines() == expected_lines
+    assert tm.width == 3
+    assert tm.height == 3
+
+
+def test_empty_normal():
+    """Test creating an empty TextMap with specified width and height."""
+    width, height = 4, 3
+    tm = TextMap.empty(width, height, fill="*")
+    expected_lines = ["****", "****", "****"]
+    assert tm.as_lines() == expected_lines
+    assert tm.width == 4
+    assert tm.height == 3
+
+
+def test_empty_with_default_fill():
+    """Test creating an empty TextMap with default fill character (space)."""
+    width, height = 2, 2
+    tm = TextMap.empty(width, height)
+    expected_lines = ["  ", "  "]
+    assert tm.as_lines() == expected_lines
+    assert tm.width == 2
+    assert tm.height == 2
+
+
+def test_empty_zero_dimensions():
+    """Test creating an empty TextMap with zero width and/or height."""
+    with pytest.raises(ValueError):
+        TextMap.empty(0, 3)
+
+    with pytest.raises(ValueError):
+        TextMap.empty(3, 0)
+
+
+def test_empty_with_unicode_fill():
+    """Test creating an empty TextMap with Unicode characters as fill."""
+    width, height = 2, 2
+    fill = "😊"
+    tm = TextMap.empty(width, height, fill=fill)
+    expected_lines = ["😊😊", "😊😊"]
+    assert tm.as_lines() == expected_lines
+    assert tm.width == 2
+    assert tm.height == 2

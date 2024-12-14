@@ -55,23 +55,23 @@ def test_as_string_empty(empty_file: Path):
 
 def test_as_lines_single_part(sample_file: Path):
     """
-    Test that `as_lines` with `multiple_parts=False` returns a list of non-empty lines.
+    Test that `as_lines` returns a list of non-empty lines.
 
     Empty lines should be filtered out.
     """
     loader = Loader(sample_file)
-    assert loader.as_lines(multiple_parts=False) == ["line1", "line2", "line3"]
+    assert loader.as_lines() == ["line1", "line2", "line3"]
 
 
 def test_as_lines_multiple_parts(sample_file: Path):
     """
-    Test for as_lines with multiple_parts=True.
+    Test for as_multiple_parts_of_lines.
 
-    Test that `as_lines` with `multiple_parts=True` returns a list of lists,
+    Test that `as_multiple_parts_of_lines` returns a list of lists,
     each representing a block of lines separated by empty lines.
     """
     loader = Loader(sample_file)
-    assert loader.as_lines(multiple_parts=True) == [["line1", "line2"], ["line3"]]
+    assert loader.as_multiple_parts_of_lines() == [["line1", "line2"], ["line3"]]
 
 
 def test_as_lines_empty(empty_file: Path):
@@ -82,8 +82,8 @@ def test_as_lines_empty(empty_file: Path):
     the `multiple_parts` parameter.
     """
     loader = Loader(empty_file)
-    assert loader.as_lines(multiple_parts=False) == []
-    assert loader.as_lines(multiple_parts=True) == []
+    assert loader.as_lines() == []
+    assert loader.as_multiple_parts_of_lines() == []
 
 
 def test_as_lines_no_empty_lines(tmp_path: Path):
@@ -96,8 +96,8 @@ def test_as_lines_no_empty_lines(tmp_path: Path):
     p = tmp_path / "no_empty_lines.txt"
     p.write_text("a\nb\nc\n")
     loader = Loader(p)
-    assert loader.as_lines(multiple_parts=False) == ["a", "b", "c"]
-    assert loader.as_lines(multiple_parts=True) == [["a", "b", "c"]]
+    assert loader.as_lines() == ["a", "b", "c"]
+    assert loader.as_multiple_parts_of_lines() == [["a", "b", "c"]]
 
 
 def test_as_lines_trailing_empty_lines(tmp_path: Path):
@@ -110,16 +110,15 @@ def test_as_lines_trailing_empty_lines(tmp_path: Path):
     p = tmp_path / "trailing_empty_lines.txt"
     p.write_text("x\n\n\n")
     loader = Loader(p)
-    assert loader.as_lines(multiple_parts=False) == ["x"]
-    assert loader.as_lines(multiple_parts=True) == [["x"]]
+    assert loader.as_lines() == ["x"]
+    assert loader.as_multiple_parts_of_lines() == [["x"]]
 
 
 def test_as_textmap(sample_file: Path):
     """
     Test that `as_textmap` returns a `TextMap` object containing lines from the file.
 
-    Verifies that the `TextMap` object receives lines from `as_lines` with
-    `multiple_parts=False`.
+    Verifies that the `TextMap` object receives lines from `as_lines`.
     """
     loader = Loader(sample_file)
     result = loader.as_textmap()
