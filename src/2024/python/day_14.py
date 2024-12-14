@@ -90,7 +90,7 @@ def part2(input_file: Path) -> int:
     for ix in range(1, time + 1):
         robots = tuple(move(*robot, *dimensions) for robot in robots)
 
-        found_lines = aoc.grid.find_lines((robot[:2] for robot in robots), 20)
+        found_lines = aoc.grid.find_lines((robot[:2] for robot in robots), 10)
 
         if found_lines:
             tm = aoc.TextMap.empty(*dimensions)
