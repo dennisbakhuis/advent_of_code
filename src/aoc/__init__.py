@@ -2,8 +2,7 @@
 
 from .loader import Loader
 from .data_files import DataFiles
-from .textmap import TextMap
-from . import grid, number
+from . import grid, number, types
 
 DATA = DataFiles()
 
@@ -14,5 +13,5 @@ __all__ = [
     "grid",
     "Loader",
     "number",
-    "TextMap",
+    "types",
 ]

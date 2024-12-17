@@ -2,13 +2,13 @@
 
 from typing import Iterable
 
-_CROSS_OFFSETS = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-_DIAGONAL_OFFSETS = [(-1, -1), (1, -1), (-1, 1), (1, 1)]
+from ..types import Coordinate
+from ..constants import ADJACENCY_DELTAS, ADJACENCY_DELTAS_ONLY_DIAGONALS
 
 
 def is_adjacent(
-    coordinate: tuple[int, int],
-    test_coordinates: tuple[int, int] | Iterable[tuple[int, int]],
+    coordinate: Coordinate,
+    other_coordinates: Coordinate | Iterable[Coordinate],
     cross_sides: bool = True,
     diagonal_sides: bool = False,
 ) -> bool:
@@ -20,7 +20,7 @@ def is_adjacent(
 
     Parameters
     ----------
-    coordinate : tuple of int
+    coordinate : Coordinate | int
         The coordinate to test, represented as a tuple (x, y).
     test_coordinates : tuple of int or iterable of tuples of int
         A single coordinate or an iterable of coordinates to check adjacency against.
@@ -36,23 +36,15 @@ def is_adjacent(
         `True` if `coord` is adjacent to any of the `other_coords` based on the specified parameters,
         `False` otherwise.
     """
-    # Define the relative positions for adjacency
-    deltas = []
-    if cross_sides:
-        deltas.extend(_CROSS_OFFSETS)
+    deltas: set[Coordinate] = ADJACENCY_DELTAS if cross_sides else set()
     if diagonal_sides:
-        deltas.extend(_DIAGONAL_OFFSETS)
+        deltas |= ADJACENCY_DELTAS_ONLY_DIAGONALS
 
-    # Generate adjacent coordinates
-    adjacent = set((coordinate[0] + dx, coordinate[1] + dy) for dx, dy in deltas)
+    adjacent_coordinates = set((coordinate[0] + dx, coordinate[1] + dy) for dx, dy in deltas)
 
-    # Check if other_coords is a single tuple or an iterable
-    if (
-        isinstance(test_coordinates, tuple)
-        and len(test_coordinates) == 2
-        and all(isinstance(n, int) for n in test_coordinates)
-    ):
-        return test_coordinates in adjacent
+    print(adjacent_coordinates)
+
+    if isinstance(other_coordinates, tuple) and isinstance(other_coordinates[0], int):
+        return other_coordinates in adjacent_coordinates
     else:
-        # Assume other_coords is an iterable of tuples
-        return any(other in adjacent for other in test_coordinates)
+        return any(other in adjacent_coordinates for other in other_coordinates)

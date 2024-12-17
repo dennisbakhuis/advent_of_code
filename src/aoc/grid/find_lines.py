@@ -5,10 +5,12 @@ from math import gcd
 from itertools import combinations
 from typing import Iterable
 
+from ..types import Coordinate
+
 
 def find_lines(
-    coordinates: Iterable[tuple[int, int]], minimal_line_length: int, diagonal_sides: bool = False
-) -> set[frozenset[tuple[int, int]]]:
+    coordinates: Iterable[Coordinate], minimal_line_length: int, diagonal_sides: bool = False
+) -> set[frozenset[Coordinate]]:
     """
     Identify groups of coordinates that form horizontal, vertical, and optionally diagonal lines.
 
@@ -16,7 +18,7 @@ def find_lines(
 
     Parameters
     ----------
-    coordinates : Tuple[Tuple[int, int], ...]
+    coordinates : Tuple[Coordinate, ...]
         A tuple of (x, y) tuples representing coordinates on a grid.
     minimal_line_length : int
         The minimal number of points required to form a line.
@@ -26,7 +28,7 @@ def find_lines(
 
     Returns
     -------
-    Tuple[Set[Tuple[int, int]], ...]
+    Tuple[Set[Coordinate], ...]
         A tuple where each element is a set of (x, y) tuples representing a line that meets
         the criteria.
     """

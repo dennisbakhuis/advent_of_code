@@ -3,7 +3,7 @@
 from pathlib import Path
 import re
 
-from .textmap import TextMap
+from .types import TextMap
 
 
 REGEX_ALL_NUMBERS = re.compile(r"-?\d+")

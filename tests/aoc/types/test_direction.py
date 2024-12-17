@@ -2,7 +2,7 @@
 
 import pytest
 
-from aoc.grid import Direction
+from aoc.types import Direction
 
 
 def test_turn_left():
@@ -70,6 +70,20 @@ def test_next_move_out_of_bounds(direction, start_x, start_y, width, height, exp
     assert direction.next_move_out_of_bounds(start_x, start_y, width, height) == expected
 
 
+def test_move_with_tuple():
+    """Test that the move method works with tuples."""
+    assert Direction.NORTH.move((2, 2)) == (2, 1)
+    assert Direction.SOUTH.move((2, 2)) == (2, 3)
+    assert Direction.WEST.move((2, 2)) == (1, 2)
+    assert Direction.EAST.move((2, 2)) == (3, 2)
+
+    with pytest.raises(ValueError):
+        Direction.NORTH.move((2, 2, 2))
+
+    with pytest.raises(TypeError):
+        Direction.NORTH.move(2)
+
+
 def test_synonyms():
     """Test that compass synonyms reference the same directions as UP, DOWN, LEFT, RIGHT."""
     assert Direction.NORTH is Direction.UP
@@ -107,3 +121,43 @@ def test_turn_right_synonyms():
     assert Direction.SOUTH.turn_right() == Direction.DOWN.turn_right()
     assert Direction.WEST.turn_right() == Direction.LEFT.turn_right()
     assert Direction.EAST.turn_right() == Direction.RIGHT.turn_right()
+
+
+def test_from_coordinates_synonyms():
+    """Test that synonyms from_coordinates correctly, matching their main directions."""
+    assert Direction.from_coordinates((0, 0), (0, 1)) == Direction.DOWN
+    assert Direction.from_coordinates((0, 0), (1, 0)) == Direction.RIGHT
+    assert Direction.from_coordinates((0, 0), (0, -1)) == Direction.UP
+    assert Direction.from_coordinates((0, 0), (-1, 0)) == Direction.LEFT
+
+    with pytest.raises(ValueError):
+        Direction.from_coordinates((0, 0), (5, 5))
+
+
+def test_from_label():
+    """Test that the from_label method returns the correct direction for all labels."""
+    assert Direction.from_label("^") == Direction.UP
+    assert Direction.from_label("v") == Direction.DOWN
+    assert Direction.from_label("<") == Direction.LEFT
+    assert Direction.from_label(">") == Direction.RIGHT
+
+    with pytest.raises(KeyError):
+        Direction.from_label("invalid")
+
+
+def test_from_label_mapping():
+    """Test that the from_label method returns the correct direction for all labels."""
+    mapping = {
+        "^": Direction.UP,
+        "v": Direction.DOWN,
+        "<": Direction.LEFT,
+        ">": Direction.RIGHT,
+    }
+
+    assert Direction.from_label("^", mapping=mapping) == Direction.UP
+    assert Direction.from_label("v", mapping=mapping) == Direction.DOWN
+    assert Direction.from_label("<", mapping=mapping) == Direction.LEFT
+    assert Direction.from_label(">", mapping=mapping) == Direction.RIGHT
+
+    with pytest.raises(TypeError):
+        Direction.from_label("G", mapping={"G": None})

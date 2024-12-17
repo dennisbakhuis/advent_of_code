@@ -2,220 +2,449 @@
 
 from typing import Iterable
 
+import pytest
+
 from aoc.grid import is_adjacent
+from aoc.types import Coordinate
 
 
-def test_single_coordinate_cross_adjacent():
+@pytest.fixture(scope="function")
+def base_coordinate() -> Coordinate:
     """
-    Test adjacency for a single coordinate with cross_sides=True and diagonal_sides=False.
+    Fixture providing a base coordinate for adjacency tests.
 
-    Verifies that a coordinate adjacent via cardinal directions is correctly identified.
+    Returns
+    -------
+    Coordinate
+        A base coordinate (1, 1).
     """
-    coord = (5, 5)
-    adjacent_coords = [(5, 6), (6, 5), (5, 4), (4, 5)]
-    for other in adjacent_coords:
+    return (1, 1)
+
+
+@pytest.fixture(scope="function")
+def adjacent_coordinates_with_diagonals() -> Iterable[Coordinate]:
+    """
+    Fixture providing coordinates adjacent to (1, 1).
+
+    Returns
+    -------
+    Iterable[Coordinate]
+        A list of coordinates adjacent to (1, 1) both orthogonally and diagonally.
+    """
+    return [
+        (0, 0),  # Bottom-left
+        (0, 2),  # Top-left
+        (2, 0),  # Bottom-right
+        (2, 2),  # Top-right
+    ]
+
+
+@pytest.fixture(scope="function")
+def adjacent_coordinates() -> Iterable[Coordinate]:
+    """
+    Fixture providing coordinates adjacent to (1, 1) without diagonals.
+
+    Returns
+    -------
+    Iterable[Coordinate]
+        A list of coordinates adjacent to (1, 1) orthogonally.
+    """
+    return [
+        (0, 1),  # Left
+        (2, 1),  # Right
+        (1, 0),  # Below
+        (1, 2),  # Above
+    ]
+
+
+@pytest.fixture(scope="function")
+def non_adjacent_coordinates() -> Iterable[Coordinate]:
+    """
+    Fixture providing coordinates that are not adjacent to (1, 1).
+
+    Returns
+    -------
+    Iterable[Coordinate]
+        A list of coordinates not adjacent to (1, 1).
+    """
+    return [
+        (0, 3),
+        (3, 0),
+        (3, 3),
+        (-1, -1),
+        (1, 3),
+        (3, 1),
+    ]
+
+
+def test_is_adjacent_single_coordinate_adjacent(base_coordinate, adjacent_coordinates):
+    """
+    Test is_adjacent with a single adjacent coordinate.
+
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    adjacent_coordinates : Iterable[Coordinate]
+        A list of adjacent coordinates.
+
+    Expected behavior:
+    - Returns True when the other coordinate is adjacent.
+    """
+    for adj in adjacent_coordinates:
+        result = is_adjacent(base_coordinate, adj)
+        assert result, f"Coordinate {adj} should be adjacent to {base_coordinate}."
+
+
+def test_is_adjacent_single_coordinate_non_adjacent(base_coordinate, non_adjacent_coordinates):
+    """
+    Test is_adjacent with a single non-adjacent coordinate.
+
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    non_adjacent_coordinates : Iterable[Coordinate]
+        A list of non-adjacent coordinates.
+
+    Expected behavior:
+    - Returns False when the other coordinate is not adjacent.
+    """
+    for non_adj in non_adjacent_coordinates:
+        result = is_adjacent(base_coordinate, non_adj)
+        assert not result, f"Coordinate {non_adj} should not be adjacent to {base_coordinate}."
+
+
+def test_is_adjacent_multiple_coordinates_some_adjacent(
+    base_coordinate, adjacent_coordinates, non_adjacent_coordinates
+):
+    """
+    Test is_adjacent with multiple coordinates where some are adjacent.
+
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    adjacent_coordinates : Iterable[Coordinate]
+        A list of adjacent coordinates.
+    non_adjacent_coordinates : Iterable[Coordinate]
+        A list of non-adjacent coordinates.
+
+    Expected behavior:
+    - Returns True if at least one coordinate is adjacent.
+    """
+    test_coords = list(adjacent_coordinates) + list(non_adjacent_coordinates)
+    result = is_adjacent(base_coordinate, test_coords)
+    assert result, "At least one coordinate in the list should be adjacent."
+
+
+def test_is_adjacent_multiple_coordinates_none_adjacent(base_coordinate, non_adjacent_coordinates):
+    """
+    Test is_adjacent with multiple coordinates where none are adjacent.
+
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    non_adjacent_coordinates : Iterable[Coordinate]
+        A list of non-adjacent coordinates.
+
+    Expected behavior:
+    - Returns False if no coordinates are adjacent.
+    """
+    result = is_adjacent(base_coordinate, non_adjacent_coordinates)
+    assert not result, "No coordinates in the list should be adjacent."
+
+
+def test_is_adjacent_cross_sides_only(base_coordinate):
+    """
+    Test is_adjacent with cross_sides=True and diagonal_sides=False.
+
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    adjacent_coordinates : Iterable[Coordinate]
+        A list of coordinates adjacent both orthogonally and diagonally.
+
+    Expected behavior:
+    - Returns True only for orthogonally adjacent coordinates.
+    """
+    orthogonal_adjacents = {(0, 1), (2, 1), (1, 0), (1, 2)}
+    diagonals = {(0, 0), (0, 2), (2, 0), (2, 2)}
+
+    # Test orthogonal adjacents
+    for adj in orthogonal_adjacents:
+        result = is_adjacent(base_coordinate, adj, cross_sides=True, diagonal_sides=False)
+        assert result, f"Orthogonal coordinate {adj} should be adjacent."
+
+    # Test diagonals
+    for diag in diagonals:
+        result = is_adjacent(base_coordinate, diag, cross_sides=True, diagonal_sides=False)
         assert (
-            is_adjacent(coord, other) is True
-        ), f"Coordinate {other} should be adjacent to {coord}."
+            not result
+        ), f"Diagonal coordinate {diag} should not be adjacent when diagonals are disabled."
 
 
-def test_single_coordinate_not_adjacent():
+def test_is_adjacent_diagonals_only(base_coordinate):
     """
-    Test that non-adjacent coordinates are correctly identified.
+    Test is_adjacent with cross_sides=False and diagonal_sides=True.
 
-    Ensures that coordinates not adjacent via any direction are not falsely identified as adjacent.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    adjacent_coordinates : Iterable[Coordinate]
+        A list of coordinates adjacent both orthogonally and diagonally.
+
+    Expected behavior:
+    - Returns True only for diagonally adjacent coordinates.
     """
-    coord = (5, 5)
-    non_adjacent_coords = [(7, 5), (5, 8), (3, 3), (10, 10)]
-    for other in non_adjacent_coords:
+    orthogonal_adjacents = {(0, 1), (2, 1), (1, 0), (1, 2)}
+    diagonals = {(0, 0), (0, 2), (2, 0), (2, 2)}
+
+    # Test orthogonal adjacents
+    for adj in orthogonal_adjacents:
+        result = is_adjacent(base_coordinate, adj, cross_sides=False, diagonal_sides=True)
         assert (
-            is_adjacent(coord, other) is False
-        ), f"Coordinate {other} should not be adjacent to {coord}."
+            not result
+        ), f"Orthogonal coordinate {adj} should not be adjacent when cross_sides is disabled."
+
+    # Test diagonals
+    for diag in diagonals:
+        result = is_adjacent(base_coordinate, diag, cross_sides=False, diagonal_sides=True)
+        assert result, f"Diagonal coordinate {diag} should be adjacent."
 
 
-def test_single_coordinate_diagonal_adjacent():
+def test_is_adjacent_all_sides(base_coordinate, adjacent_coordinates):
     """
-    Test adjacency for a single coordinate including diagonals.
+    Test is_adjacent with cross_sides=True and diagonal_sides=True.
 
-    Verifies that diagonal adjacency is correctly identified when diagonal_sides=True.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    adjacent_coordinates : Iterable[Coordinate]
+        A list of coordinates adjacent both orthogonally and diagonally.
+
+    Expected behavior:
+    - Returns True for both orthogonally and diagonally adjacent coordinates.
     """
-    coord = (5, 5)
-    diagonal_coords = [(6, 6), (4, 6), (6, 4), (4, 4)]
-    for other in diagonal_coords:
-        # Should be False when diagonal_sides=False
+    for adj in adjacent_coordinates:
+        result = is_adjacent(base_coordinate, adj, cross_sides=True, diagonal_sides=True)
         assert (
-            is_adjacent(coord, other) is False
-        ), f"Coordinate {other} should not be adjacent without diagonals."
-
-        # Should be True when diagonal_sides=True
-        assert (
-            is_adjacent(coord, other, diagonal_sides=True) is True
-        ), f"Coordinate {other} should be adjacent with diagonals."
+            result
+        ), f"Coordinate {adj} should be adjacent with both cross and diagonal sides enabled."
 
 
-def test_iterable_coordinates_some_adjacent():
+def test_is_adjacent_no_sides(base_coordinate, adjacent_coordinates, non_adjacent_coordinates):
     """
-    Test adjacency when provided with an iterable containing both adjacent and non-adjacent coordinates.
+    Test is_adjacent with cross_sides=False and diagonal_sides=False.
 
-    Ensures that the function returns True if any coordinate in the iterable is adjacent.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    adjacent_coordinates : Iterable[Coordinate]
+        A list of coordinates adjacent both orthogonally and diagonally.
+    non_adjacent_coordinates : Iterable[Coordinate]
+        A list of non-adjacent coordinates.
+
+    Expected behavior:
+    - Returns False for all coordinates as no adjacency sides are enabled.
     """
-    coord = (5, 5)
-    test_coords = [(7, 5), (5, 6), (10, 10)]
-    assert is_adjacent(coord, test_coords) is True, "At least one coordinate should be adjacent."
+    test_coords = list(adjacent_coordinates) + list(non_adjacent_coordinates)
+    result = is_adjacent(base_coordinate, test_coords, cross_sides=False, diagonal_sides=False)
+    assert not result, "No adjacency sides enabled should result in no adjacents."
 
 
-def test_iterable_coordinates_none_adjacent():
+def test_is_adjacent_empty_other_coordinates(base_coordinate):
     """
-    Test adjacency when provided with an iterable containing no adjacent coordinates.
+    Test is_adjacent with an empty iterable of other_coordinates.
 
-    Ensures that the function returns False when none of the coordinates are adjacent.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+
+    Expected behavior:
+    - Returns False as there are no coordinates to be adjacent.
     """
-    coord = (5, 5)
-    test_coords = [(7, 5), (5, 8), (10, 10)]
-    assert is_adjacent(coord, test_coords) is False, "No coordinates should be adjacent."
+    result = is_adjacent(base_coordinate, [], cross_sides=True, diagonal_sides=False)
+    assert not result, "Empty other_coordinates should result in no adjacents."
 
 
-def test_iterable_coordinates_with_diagonals():
+def test_is_adjacent_same_coordinate(base_coordinate):
     """
-    Test adjacency for an iterable of coordinates including diagonals.
+    Test is_adjacent where the other coordinate is the same as the base.
 
-    Verifies that the function correctly identifies adjacent coordinates when diagonals are considered.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+
+    Expected behavior:
+    - Returns False as a coordinate is not adjacent to itself.
     """
-    coord = (5, 5)
-    test_coords = [(7, 5), (5, 6), (6, 6)]
-
-    # Without diagonals, only (5,6) and (6,5) would be adjacent
-    assert (
-        is_adjacent(coord, test_coords, diagonal_sides=False) is True
-    ), "At least one coordinate should be adjacent without diagonals."
-
-    # With diagonals, (6,6) should also be considered adjacent
-    assert (
-        is_adjacent(coord, test_coords, diagonal_sides=True) is True
-    ), "At least one coordinate should be adjacent with diagonals."
+    result = is_adjacent(base_coordinate, base_coordinate)
+    assert not result, "A coordinate should not be adjacent to itself."
 
 
-def test_empty_iterable():
+def test_is_adjacent_multiple_calls_consistency(base_coordinate, adjacent_coordinates):
     """
-    Test adjacency when provided with an empty iterable.
+    Test is_adjacent with multiple calls to ensure consistency.
 
-    Ensures that the function returns False when the iterable is empty.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    adjacent_coordinates : Iterable[Coordinate]
+        A list of coordinates adjacent both orthogonally and diagonally.
+
+    Expected behavior:
+    - Each call to is_adjacent should consistently return the correct result.
     """
-    coord = (5, 5)
-    test_coords: Iterable[tuple[int, int]] = []
-    assert is_adjacent(coord, test_coords) is False, "Empty iterable should return False."
+    # First with cross_sides=True, diagonal_sides=False
+    orthogonal_adjacents = {(0, 1), (2, 1), (1, 0), (1, 2)}
+    for adj in adjacent_coordinates:
+        expected = adj in orthogonal_adjacents
+        result = is_adjacent(base_coordinate, adj, cross_sides=True, diagonal_sides=False)
+        assert result == expected, f"Adjacency result inconsistent for {adj}."
 
 
-def test_large_coordinates():
+def test_is_adjacent_invalid_input(base_coordinate):
     """
-    Test adjacency for coordinates with large integer values.
+    Test is_adjacent with invalid input types for other_coordinates.
 
-    Verifies that the function works correctly with large numbers.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+
+    Expected behavior:
+    - Raises a TypeError when other_coordinates is not a Coordinate or Iterable[Coordinate].
     """
-    coord = (1000000, 1000000)
-    adjacent_coords = [(1000000, 1000001), (1000001, 1000000), (1000000, 999999), (999999, 1000000)]
-    for other in adjacent_coords:
-        assert (
-            is_adjacent(coord, other) is True
-        ), f"Coordinate {other} should be adjacent to {coord}."
+    with pytest.raises(TypeError):
+        is_adjacent(base_coordinate, 123)  # Invalid type
 
 
-def test_negative_coordinates():
+def test_is_adjacent_large_coordinates(base_coordinate):
     """
-    Test adjacency for coordinates with negative integer values.
+    Test is_adjacent with large coordinate values.
 
-    Ensures that the function correctly identifies adjacency in negative coordinate spaces.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+
+    Expected behavior:
+    - Correctly identifies adjacency regardless of coordinate magnitude.
     """
-    coord = (-5, -5)
-    adjacent_coords = [(-5, -4), (-4, -5), (-5, -6), (-6, -5)]
-    non_adjacent_coords = [(-7, -5), (-5, -8), (-3, -3)]
+    large_adjacent = (1000, 1001)  # Assuming base is (1000, 1000)
+    base = (1000, 1000)
+    result = is_adjacent(base, large_adjacent)
+    assert result, f"Large coordinate {large_adjacent} should be adjacent to {base}."
 
-    for other in adjacent_coords:
-        assert (
-            is_adjacent(coord, other) is True
-        ), f"Coordinate {other} should be adjacent to {coord}."
-
-    for other in non_adjacent_coords:
-        assert (
-            is_adjacent(coord, other) is False
-        ), f"Coordinate {other} should not be adjacent to {coord}."
+    large_non_adjacent = (1002, 1002)
+    result = is_adjacent(base, large_non_adjacent)
+    assert not result, f"Large coordinate {large_non_adjacent} should not be adjacent to {base}."
 
 
-def test_coordinate_same_as_test():
+def test_is_adjacent_negative_coordinates():
     """
-    Test behavior when the coordinate being tested is the same as the target coordinate.
+    Test is_adjacent with negative coordinate values.
 
-    Ensures that a coordinate is not considered adjacent to itself.
+    Expected behavior:
+    - Correctly identifies adjacency with negative coordinates.
     """
-    coord = (5, 5)
-    assert is_adjacent(coord, coord) is False, "A coordinate should not be adjacent to itself."
+    base = (0, 0)
+    adjacent_neg = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+    non_adjacent_neg = [(-2, 0), (0, -2), (2, 2), (-2, -2)]
+
+    for adj in adjacent_neg:
+        result = is_adjacent(base, adj, diagonal_sides=True)
+        assert result, f"Negative coordinate {adj} should be adjacent to {base}."
+
+    for non_adj in non_adjacent_neg:
+        result = is_adjacent(base, non_adj)
+        assert not result, f"Negative coordinate {non_adj} should not be adjacent to {base}."
 
 
-def test_multiple_adjacent_coordinates():
+def test_is_adjacent_iterable_as_generator(base_coordinate, adjacent_coordinates):
     """
-    Test adjacency when multiple coordinates are adjacent.
+    Test is_adjacent with other_coordinates provided as a generator.
 
-    Verifies that the function returns True when multiple coordinates are adjacent.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    adjacent_coordinates : Iterable[Coordinate]
+        A list of coordinates adjacent both orthogonally and diagonally.
+
+    Expected behavior:
+    - Correctly identifies adjacency when other_coordinates is a generator.
     """
-    coord = (5, 5)
-    test_coords = [(5, 6), (6, 5), (5, 4), (4, 5)]
-    assert is_adjacent(coord, test_coords) is True, "Multiple coordinates should be adjacent."
+    generator = (coord for coord in adjacent_coordinates)
+    result = is_adjacent(base_coordinate, generator)
+    assert result, "Generator containing adjacent coordinates should return True."
 
 
-def test_mixed_adjacent_and_non_adjacent():
+def test_is_adjacent_iterable_as_set(base_coordinate, adjacent_coordinates):
     """
-    Test adjacency with a mix of adjacent and non-adjacent coordinates.
+    Test is_adjacent with other_coordinates provided as a set.
 
-    Ensures that the presence of at least one adjacent coordinate results in a True return value.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    adjacent_coordinates : Iterable[Coordinate]
+        A list of coordinates adjacent both orthogonally and diagonally.
+
+    Expected behavior:
+    - Correctly identifies adjacency when other_coordinates is a set.
     """
-    coord = (5, 5)
-    test_coords = [(7, 5), (5, 6), (10, 10), (4, 5)]
-    assert is_adjacent(coord, test_coords) is True, "At least one coordinate should be adjacent."
+    coord_set = set(adjacent_coordinates)
+    result = is_adjacent(base_coordinate, coord_set)
+    assert result, "Set containing adjacent coordinates should return True."
 
 
-def test_only_diagonal_adjacent():
+def test_is_adjacent_iterable_as_list_no_adjacent(base_coordinate, non_adjacent_coordinates):
     """
-    Test adjacency when only diagonal coordinates are adjacent.
+    Test is_adjacent with other_coordinates provided as a list with no adjacents.
 
-    Ensures that without enabling diagonal_sides, diagonal adjacents are not considered.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    non_adjacent_coordinates : Iterable[Coordinate]
+        A list of coordinates not adjacent to the base.
+
+    Expected behavior:
+    - Returns False when none of the coordinates are adjacent.
     """
-    coord = (5, 5)
-    diagonal_coords = [(6, 6), (4, 6), (6, 4), (4, 4)]
-    for other in diagonal_coords:
-        assert (
-            is_adjacent(coord, other) is False
-        ), f"Diagonal coordinate {other} should not be adjacent without diagonals."
+    coord_list = list(non_adjacent_coordinates)
+    result = is_adjacent(base_coordinate, coord_list)
+    assert not result, "List with no adjacent coordinates should return False."
 
 
-def test_boundary_conditions():
+def test_is_adjacent_mixed_adjacent_and_non_adjacent(
+    base_coordinate, adjacent_coordinates, non_adjacent_coordinates
+):
     """
-    Test adjacency at boundary conditions (e.g., origin).
+    Test is_adjacent with a mix of adjacent and non-adjacent coordinates.
 
-    Ensures that the function correctly identifies adjacency when coordinates are at or near boundaries.
+    Parameters
+    ----------
+    base_coordinate : Coordinate
+        The base coordinate to test against.
+    adjacent_coordinates : Iterable[Coordinate]
+        A list of coordinates adjacent to the base.
+    non_adjacent_coordinates : Iterable[Coordinate]
+        A list of coordinates not adjacent to the base.
+
+    Expected behavior:
+    - Returns True as at least one coordinate is adjacent.
     """
-    coord = (0, 0)
-    adjacent_coords = [(0, 1), (1, 0)]
-    non_adjacent_coords = [(1, 1), (-2, 0), (0, -2)]
-
-    for other in adjacent_coords:
-        assert (
-            is_adjacent(coord, other) is True
-        ), f"Coordinate {other} should be adjacent to {coord}."
-
-    for other in non_adjacent_coords:
-        assert (
-            is_adjacent(coord, other) is False
-        ), f"Coordinate {other} should not be adjacent to {coord}."
-
-
-def test_multiple_adjacent_with_diagonals():
-    """
-    Test adjacency with multiple adjacent coordinates including diagonals.
-
-    Verifies that the function correctly identifies multiple adjacents when diagonals are enabled.
-    """
-    coord = (5, 5)
-    test_coords = [(5, 6), (6, 6), (6, 5), (5, 4), (4, 5), (4, 4)]
-    assert (
-        is_adjacent(coord, test_coords, diagonal_sides=True) is True
-    ), "Multiple coordinates should be adjacent with diagonals."
+    mixed_coords = list(adjacent_coordinates) + list(non_adjacent_coordinates)
+    result = is_adjacent(base_coordinate, mixed_coords)
+    assert result, "Mixed list with at least one adjacent coordinate should return True."

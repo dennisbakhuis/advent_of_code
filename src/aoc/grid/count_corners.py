@@ -3,9 +3,11 @@
 from typing import Iterable
 from collections import defaultdict
 
+from ..types import Coordinate
+
 
 def count_corners(
-    coordinates: Iterable[tuple[int, int]],
+    coordinates: Iterable[Coordinate],
     style: str = "minecraft",
 ) -> int:
     """
@@ -18,7 +20,7 @@ def count_corners(
 
     Parameters
     ----------
-    coordinates : Iterable[tuple[int, int]]
+    coordinates : Iterable[Coordinate]
         The coordinates of the filled unit squares.
     style : str, optional
         The style of the grid (default "minecraft").

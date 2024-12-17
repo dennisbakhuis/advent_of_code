@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import aoc  # AoC helpers
-from aoc.grid import Direction
+from aoc.types import Direction, Coordinate
 
 
 YEAR = 2024
@@ -12,11 +12,11 @@ DAY = 6
 
 def do_patrol(
     location: tuple[int, int, Direction],
-    obstacles: set[tuple[int, int]],
+    obstacles: set[Coordinate],
     width: int,
     height: int,
-    new_obstacle: tuple[int, int] | None = None,
-) -> set[tuple[int, int]] | None:
+    new_obstacle: Coordinate | None = None,
+) -> set[Coordinate] | None:
     """
     Compute the path until going out of bounds or looping.
 
@@ -24,18 +24,18 @@ def do_patrol(
     ----------
     location : tuple[int, int, aoc.grid.Direction]
         Starting position and direction.
-    obstacles : set[tuple[int, int]]
+    obstacles : set[Coordinate]
         Obstacle locations.
     width : int
         Map width.
     height : int
         Map height.
-    new_obstacle : tuple[int, int] or None, optional
+    new_obstacle : Coordinate or None, optional
         An extra obstacle to add, by default None.
 
     Returns
     -------
-    set[tuple[int, int]] or None
+    set[Coordinate] or None
         Visited coordinates or None if loop detected.
     """
     obstacle_list = set(obstacles)

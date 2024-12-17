@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 from aoc import Loader
-from aoc import TextMap
+from aoc.types import TextMap
 
 
 @pytest.fixture

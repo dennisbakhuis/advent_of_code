@@ -3,7 +3,7 @@
 import re
 from typing import Iterable
 
-from .grid import within_bounds
+from ..grid.within_bounds import within_bounds
 
 
 class TextMap:
@@ -53,9 +53,9 @@ class TextMap:
         return cls(map_string.splitlines())
 
     @classmethod
-    def empty(cls, width: int, height: int, fill: str = " ") -> "TextMap":
+    def new(cls, width: int, height: int, fill: str = " ") -> "TextMap":
         """
-        Create an empty map with the specified dimensions.
+        Create an new map with the specified dimensions.
 
         Parameters
         ----------
@@ -75,6 +75,22 @@ class TextMap:
             raise ValueError("Width and height must be positive integers.")
 
         return cls([fill * width for _ in range(height)])
+
+    def empty(self, fill: str = " ") -> "TextMap":
+        """
+        Create an empty map with the same dimensions as original map.
+
+        Parameters
+        ----------
+        fill : str, optional
+            Character to fill the map with (default is space).
+
+        Returns
+        -------
+        TextMap
+            A new map object.
+        """
+        return self.new(self._n_columns, self._n_rows, fill)
 
     @property
     def width(self) -> int:
@@ -148,22 +164,56 @@ class TextMap:
             self.get(x, y, out_of_bounds_character=out_of_bounds_character) for x, y in coordinates
         )
 
-    def set(self, x: int, y: int, value: str) -> None:
+    def __eq__(self, other: "TextMap") -> bool:
+        """Check if two TextMap objects are equal based on _map_string."""
+        if not isinstance(other, TextMap):
+            raise NotImplementedError
+        return self._map_string == other._map_string
+
+    def __ne__(self, other: "TextMap") -> bool:
+        """Check if two TextMap objects are not equal based on _map_string."""
+        return not self.__eq__(other)
+
+    def set(self, x: int | tuple[int, int], y: int | None = None, value: str = ...) -> None:
         """
         Set the character at the given coordinates.
 
         Parameters
         ----------
-        x : int
-            X-coordinate (column).
-        y : int
-            Y-coordinate (row).
+        x : int or tuple[int, int]
+            X-coordinate (column) or a tuple of (x, y) coordinates.
+        y : int, optional
+            Y-coordinate (row). Required if `x` is an integer.
         value : str
-            Character to place at (x, y).
+            Character to place at the specified coordinates.
+
+        Raises
+        ------
+        TypeError
+            If arguments do not match expected types.
+        ValueError
+            If y is not provided when x is an integer or if the tuple does not have exactly two elements.
+        IndexError
+            If the coordinates are out of bounds.
         """
-        if 0 <= x < self._n_columns and 0 <= y < self._n_rows:
-            ix = y * self._n_columns + x
-            self._map_string = self._map_string[:ix] + value + self._map_string[ix + 1 :]
+        if isinstance(x, tuple):
+            if not isinstance(y, str):
+                raise TypeError("When providing a tuple for coordinates, do not provide 'y'.")
+            if len(x) != 2:
+                raise ValueError("Tuple must have exactly two elements (x, y).")
+            current_x, current_y = x
+            value = y
+        elif isinstance(x, int) and isinstance(y, int):
+            current_x, current_y = x, y
+        else:
+            raise TypeError("set() expects either two integers (x, y) or a single tuple (x, y).")
+
+        if not (0 <= current_x < self._n_columns) or not (0 <= current_y < self._n_rows):
+            raise IndexError("Coordinates are out of bounds.")
+
+        ix = current_y * self._n_columns + current_x
+
+        self._map_string = self._map_string[:ix] + value + self._map_string[ix + 1 :]
 
     def set_many(self, coordinates: Iterable[tuple[int, int]], value: str) -> None:
         """
@@ -338,3 +388,22 @@ class TextMap:
                 )
 
         return horizontal_numbers
+
+    def switch_tiles(
+        self,
+        coordinate_pairs: Iterable[tuple[tuple[int, int], tuple[int, int]]],
+    ) -> None:
+        """
+        Switch tiles in the map.
+
+        Parameters
+        ----------
+        coordinate_pairs : list of tuple of tuple of int
+            List of coordinate pairs to switch.
+        """
+        for (x1, y1), (x2, y2) in coordinate_pairs:
+            if self.within_bounds((x1, y1)) and self.within_bounds((x2, y2)):
+                tile1 = self.get(x1, y1)
+                tile2 = self.get(x2, y2)
+                self.set(x1, y1, tile2)
+                self.set(x2, y2, tile1)

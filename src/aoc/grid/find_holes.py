@@ -3,21 +3,23 @@
 from collections import deque
 from typing import Iterable
 
+from ..types import Coordinate
+
 
 def find_holes(
-    coordinates: Iterable[tuple[int, int]],
-) -> set[tuple[int, int]]:
+    coordinates: Iterable[Coordinate],
+) -> set[Coordinate]:
     """
     Find all "holes" (enclosed empty cells) within a given set of coordinates.
 
     Parameters
     ----------
-    coordinates : Iterable[tuple[int, int]]
+    coordinates : Iterable[Coordinate]
         An iterable of 2D coordinates (x, y), representing occupied cells.
 
     Returns
     -------
-    set[tuple[int, int]]
+    set[Coordinate]
         A set of 2D coordinates (x, y) that are "holes," i.e., enclosed empty cells
         that are completely surrounded by occupied cells.
 

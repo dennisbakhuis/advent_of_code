@@ -1,13 +1,14 @@
 """Get coordinates from a straight line between two points."""
 
 from .within_bounds import within_bounds
+from ..types import Coordinate
 
 
 def get_coordinates_from_line(
-    start: tuple[int, int],
-    end: tuple[int, int],
+    start: Coordinate,
+    end: Coordinate,
     bounds: tuple[int, int, int, int] | None = None,
-) -> set[tuple[int, int]]:
+) -> set[Coordinate]:
     """
     Retrieve all coordinates on a straight line between start and end positions.
 
@@ -15,16 +16,16 @@ def get_coordinates_from_line(
 
     Parameters
     ----------
-    start : tuple of int
+    start : Coordinate
         The starting coordinate as (x, y).
-    end : tuple of int
+    end : Coordinate
         The ending coordinate as (x, y).
     bounds : tuple of int, optional
         The boundaries as (min_x, min_y, max_x, max_y). If None, all coordinates are considered valid.
 
     Returns
     -------
-    set of tuple of int
+    set[Coordinate]
         A set containing all coordinates on the line from start to end, inclusive (x, y).
 
     Raises

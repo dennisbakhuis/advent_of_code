@@ -13,7 +13,7 @@ python_puzzles = list(sorted(Path("src").glob("20*/python/day*.py")))
 def import_file_as_module(path):
     """Import a Python file as a module."""
     filename = os.path.basename(path)
-    module_name = os.path.splitext(filename)[0]  # Extract the filename without extension
+    module_name = os.path.splitext(filename)[0]
     spec = importlib.util.spec_from_file_location(module_name, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

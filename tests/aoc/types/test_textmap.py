@@ -3,7 +3,7 @@
 import pytest
 from io import StringIO
 from unittest.mock import patch
-from aoc import TextMap
+from aoc.types import TextMap
 
 
 @pytest.fixture
@@ -204,17 +204,20 @@ def test_set(tm):
     assert tm.get(0, 0) == "A"
     assert tm.get(2, 2) == "I"
 
+    tm.set((2, 2), "Z")
+    assert tm.get(2, 2) == "Z"
 
-def test_set_out_of_bounds(tm):
-    """
-    Test set method with out-of-bounds coordinates.
+    with pytest.raises(TypeError):
+        tm.set((2, 2), 5, "Z")
 
-    Should not raise errors, but also should not modify the map.
-    """
-    original = tm.as_string()
-    tm.set(-1, 0, "Z")
-    tm.set(3, 3, "Z")
-    assert tm.as_string() == original
+    with pytest.raises(ValueError):
+        tm.set((1, 1, 1), "Z")
+
+    with pytest.raises(TypeError):
+        tm.set(1, None, "Z")
+
+    with pytest.raises(IndexError):
+        tm.set(3, 3, "Z")
 
 
 def test_find(tm):
@@ -569,14 +572,6 @@ def test_set_many_normal(tm):
     assert tm.as_lines() == expected_lines
 
 
-def test_set_many_with_out_of_bounds(tm):
-    """Test setting coordinates where some are out of bounds."""
-    coordinates = [(-1, 0), (0, -1), (1, 1), (3, 3)]
-    tm.set_many(coordinates, "X")
-    expected_lines = ["ABC", "DXF", "GHI"]
-    assert tm.as_lines() == expected_lines  # Only (1,1) is in bounds
-
-
 def test_set_many_empty_coordinates(tm):
     """Test setting with an empty coordinates iterable."""
     coordinates = []
@@ -729,41 +724,34 @@ def test_from_string_with_unicode(map_string_with_unicode):
     assert tm.height == 3
 
 
-def test_empty_normal():
-    """Test creating an empty TextMap with specified width and height."""
-    width, height = 4, 3
-    tm = TextMap.empty(width, height, fill="*")
-    expected_lines = ["****", "****", "****"]
+def test_new():
+    """Test creating a new TextMap instance with the new method."""
+    tm = TextMap.new(3, 3, fill="X")
+    expected_lines = ["XXX", "XXX", "XXX"]
     assert tm.as_lines() == expected_lines
-    assert tm.width == 4
+    assert tm.width == 3
     assert tm.height == 3
 
-
-def test_empty_with_default_fill():
-    """Test creating an empty TextMap with default fill character (space)."""
-    width, height = 2, 2
-    tm = TextMap.empty(width, height)
-    expected_lines = ["  ", "  "]
-    assert tm.as_lines() == expected_lines
-    assert tm.width == 2
-    assert tm.height == 2
-
-
-def test_empty_zero_dimensions():
-    """Test creating an empty TextMap with zero width and/or height."""
     with pytest.raises(ValueError):
-        TextMap.empty(0, 3)
-
-    with pytest.raises(ValueError):
-        TextMap.empty(3, 0)
+        TextMap.new(0, 0, fill="X")
 
 
-def test_empty_with_unicode_fill():
-    """Test creating an empty TextMap with Unicode characters as fill."""
-    width, height = 2, 2
-    fill = "😊"
-    tm = TextMap.empty(width, height, fill=fill)
-    expected_lines = ["😊😊", "😊😊"]
-    assert tm.as_lines() == expected_lines
-    assert tm.width == 2
-    assert tm.height == 2
+def test_empty(tm):
+    """Test creating an empty TextMap with the empty method."""
+    empty_tm = tm.empty(fill="x")
+
+    assert empty_tm.width == tm.width
+    assert empty_tm.height == tm.height
+    assert empty_tm.as_lines() == ["xxx", "xxx", "xxx"]
+
+
+def test_compare(tm):
+    """Test the compare method."""
+    other_map = TextMap(["ABC", "DEF", "GHI"])
+    assert tm == other_map
+
+    other_map.set(0, 0, "Z")
+    assert tm != other_map
+
+    with pytest.raises(NotImplementedError):
+        tm == "ABC"  # noqa: B015

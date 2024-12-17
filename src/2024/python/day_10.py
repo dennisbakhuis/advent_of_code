@@ -4,6 +4,7 @@ from pathlib import Path
 from collections import deque
 
 import aoc  # AoC helpers
+from aoc.types import TextMap
 
 
 YEAR = 2024
@@ -16,7 +17,7 @@ simple_map = """0123
 9876"""
 
 
-def get_trails(textmap: aoc.TextMap) -> set[tuple[str]]:
+def get_trails(textmap: TextMap) -> set[tuple[str]]:
     """
     Get all trails from the textmap.
 

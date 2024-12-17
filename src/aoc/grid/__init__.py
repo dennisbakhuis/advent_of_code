@@ -1,7 +1,9 @@
 """Grouped functions for working with grids."""
 
+from .adjacency_map import adjacency_map
 from .count_corners import count_corners
-from .direction import Direction
+from .dijkstra import dijkstra
+from .find_adjacent import find_adjacent
 from .find_holes import find_holes
 from .find_lines import find_lines
 from .get_coordinates_from_line import get_coordinates_from_line
@@ -14,8 +16,10 @@ from .within_bounds import within_bounds
 
 
 __all__ = [
+    "adjacency_map",
     "count_corners",
-    "Direction",
+    "dijkstra",
+    "find_adjacent",
     "find_holes",
     "find_lines",
     "get_coordinates_from_line",

@@ -3,13 +3,14 @@
 from pathlib import Path
 
 import aoc  # AoC helpers
+from aoc.types import Coordinate
 
 
 YEAR = 2024
 DAY = 12
 
 
-def get_plant_groups(input_file: Path) -> list[set[tuple[int, int]]]:
+def get_plant_groups(input_file: Path) -> list[set[Coordinate]]:
     """Get groups of connected plant cells."""
     tm = aoc.Loader(input_file).as_textmap()
     plant_types = set(tm.as_string().replace("\n", ""))

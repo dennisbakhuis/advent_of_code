@@ -2,35 +2,37 @@
 
 from typing import Iterable
 
+from ..types import Coordinate
+from ..constants import ADJACENCY_DELTAS, ADJACENCY_DELTAS_ONLY_DIAGONALS
+
 
 def group_adjacent(
-    coordinates: Iterable[tuple[int, int]],
+    coordinates: Iterable[Coordinate],
     cross_sides: bool = True,
     diagonal_sides: bool = False,
-) -> set[frozenset[tuple[int, int]]]:
+) -> set[frozenset[Coordinate]]:
     """
     Group coordinates by adjacency.
 
     Parameters
     ----------
-    coords : iterable of (int, int)
+    coords : iterable of Coordinate
         The coordinates to group.
     cross_sides : bool, optional
-        If True, consider horizontal/vertical adjacency (default True).
+        If True, consider horizontal and vertical adjacency (default True).
     diagonal_sides : bool, optional
         If True, consider diagonal adjacency (default False).
 
     Returns
     -------
-    set of frozenset
+    set of frozenset[Coordinate]
         A set of frozensets, each containing connected coordinates.
     """
     coordinates = set(coordinates)
-    adj = []
-    if cross_sides:
-        adj += [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+    deltas = ADJACENCY_DELTAS if cross_sides else set()
     if diagonal_sides:
-        adj += [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+        deltas |= ADJACENCY_DELTAS_ONLY_DIAGONALS
 
     visited = set()
     groups = set()
@@ -44,7 +46,7 @@ def group_adjacent(
                     continue
                 visited.add(cur)
                 group.add(cur)
-                for dx, dy in adj:
+                for dx, dy in deltas:
                     n = (cur[0] + dx, cur[1] + dy)
                     if n in coordinates and n not in visited:
                         stack.append(n)
