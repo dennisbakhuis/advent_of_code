@@ -3,8 +3,10 @@
 from .adjacency_map import adjacency_map
 from .count_corners import count_corners
 from .dijkstra import dijkstra
+from .dijkstra_with_direction import dijkstra_with_direction
 from .find_adjacent import find_adjacent
 from .find_holes import find_holes
+from .find_shortest_path import find_shortest_path
 from .find_lines import find_lines
 from .get_coordinates_from_line import get_coordinates_from_line
 from .group_adjacent import group_adjacent
@@ -19,8 +21,10 @@ __all__ = [
     "adjacency_map",
     "count_corners",
     "dijkstra",
+    "dijkstra_with_direction",
     "find_adjacent",
     "find_holes",
+    "find_shortest_path",
     "find_lines",
     "get_coordinates_from_line",
     "group_adjacent",

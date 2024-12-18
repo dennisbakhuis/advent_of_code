@@ -1,66 +1,63 @@
 """Dijkstra algorithm to find the shortest path to all coordinates."""
 
 import heapq
-from typing import Iterable, Callable
+from typing import Iterable
 
-from ..types import Coordinate, Direction
-from .adjacency_map import adjacency_map
-
-
-UNREACHABLE = float("inf")
-
-# Format for the scoring function
-# A function that needs the following signature:
-# def scoring_function(
-#   previous location: Coordinate,
-#   current_location: Coordinate,
-#   previous_direction: Coordinate,
-#   current_direction: : Coordinate,
-# ) -> int:
-Dijkstra_Scoring_Function = Callable[[Coordinate, Coordinate, Direction, Direction], int]
-
-
-def manhatten_scoring(*args, **kwargs) -> int:
-    """Manhattan scoring function, simply returning 1 for each step."""
-    return 1
+from ..types import Coordinate, DijkstraScoringFunction, DijkstraPathTree
+from ..constants import UNREACHABLE
+from .scoring_functions import manhatten_scoring
 
 
 def dijkstra(
     coordinates: Iterable[Coordinate],
     start: Coordinate,
-    scoring_function: Dijkstra_Scoring_Function = manhatten_scoring,
-) -> dict:
-    """Dijkstra algorithm to find the shortest path to all coordinates."""
-    queue = [(0, start, set(), Direction.EAST)]
+    scoring_function: DijkstraScoringFunction = manhatten_scoring,
+) -> DijkstraPathTree:
+    """
+    Dijkstra algorithm to find the shortest path to all coordinates.
 
-    seen_states = {
-        coordinate: {direction: {"score": UNREACHABLE, "tiles": set()} for direction in Direction}
-        for coordinate in coordinates
-    }
+    Parameters
+    ----------
+    coordinates : Iterable[Coordinate]
+        The coordinates to search.
+    start : Coordinate
+        The starting coordinate.
+    scoring_function : DijkstraScoringFunction, optional
+        The scoring function, by default default_scoring_func
 
-    adjacency_lookup_table = adjacency_map(coordinates)
+    Returns
+    -------
+    dijkstra_path_tree : DijkstraPathTree
+    """
+    coords = set(coordinates)
+    path_tree: DijkstraPathTree = {c: {"score": UNREACHABLE, "tiles": []} for c in coords}
+    path_tree[start]["score"] = 0
+    prev = {c: None for c in coords}
 
+    queue = [(0, start)]
     while queue:
-        score, location, tiles, direction = heapq.heappop(queue)
-        adjacent = adjacency_lookup_table[location] - tiles
+        score, location = heapq.heappop(queue)
+        if score > path_tree[location]["score"]:
+            continue
 
-        for new_location in adjacent:
-            new_direction = Direction.from_coordinates(location, new_location)
+        x, y = location
+        for new_location in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]:
+            if new_location in coords:
+                new_score = score + scoring_function(location, new_location)
+                if new_score < path_tree[new_location]["score"]:
+                    path_tree[new_location]["score"] = new_score
+                    prev[new_location] = location
+                    heapq.heappush(queue, (new_score, new_location))
 
-            state = seen_states[new_location][new_direction]
+    # Reconstruct paths
+    for c in coords:
+        if path_tree[c]["score"] != UNREACHABLE and c != start:
+            path = []
+            curr = c
+            while curr is not None and curr != start:
+                path.append(curr)
+                curr = prev[curr]
+            path.reverse()
+            path_tree[c]["tiles"] = path
 
-            new_score = score + scoring_function(location, new_location, direction, new_direction)
-
-            if new_score > state["score"]:
-                continue
-            state["score"] = new_score
-
-            new_tiles = tiles | {new_location}
-
-            if new_score < state["score"]:  # pragma: no cover
-                state["tiles"] = new_tiles
-            elif new_score == state["score"]:
-                state["tiles"] |= new_tiles
-
-            heapq.heappush(queue, (new_score, new_location, state["tiles"], new_direction))
-    return seen_states
+    return path_tree

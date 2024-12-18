@@ -5,6 +5,7 @@ from pathlib import Path
 
 import aoc  # AoC helpers
 from aoc.types import Direction
+from aoc.grid import dijkstra_with_direction
 
 
 YEAR = 2024
@@ -28,7 +29,7 @@ def part1(input_file: Path) -> int:
     end = maze.find("E")
     way_points = tuple(maze.find_all(".") + [start, end])
 
-    states = aoc.grid.dijkstra(way_points, start, corner_penalty_scoring)
+    states = dijkstra_with_direction(way_points, start, scoring_function=corner_penalty_scoring)
     min_direction = min(states[end].values(), key=lambda d: d["score"])
     score = min_direction["score"]
 
@@ -43,7 +44,7 @@ def part2(input_file: Path) -> int:
     end = maze.find("E")
     way_points = tuple(maze.find_all(".") + [start, end])
 
-    states = aoc.grid.dijkstra(way_points, start, corner_penalty_scoring)
+    states = dijkstra_with_direction(way_points, start, scoring_function=corner_penalty_scoring)
     min_direction = min(states[end].values(), key=lambda d: d["score"])
     n_tiles = len(min_direction["tiles"]) + 1
 

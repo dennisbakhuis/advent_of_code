@@ -37,18 +37,22 @@ if __name__ == "__main__":
 
     # --- Part One ---
 
-    print(f"Solution (example) part 1: {part1(example_file)}")
-    # assert part1(example_file) == ANSWER_EXAMPLE_PART_1
+    solution = part1(example_file)
+    print(f"Solution (example) part 1: {solution}")
+    # assert solution == ANSWER_EXAMPLE_PART_1
 
-    # print(f"Solution (input) part 1: {part1(input_file)}")
-    # assert part1(input_file) == ANSWER_INPUT_PART_1
+    # solution = part1(input_file)
+    # print(f"Solution (input) part 1: {solution}")
+    # assert solution == ANSWER_INPUT_PART_1
 
     # # --- Part Two ---
 
-    # print(f"Solution (example) part 2: {part2(example_file)}")
-    # assert part2(example_file) == ANSWER_EXAMPLE_PART_2
+    # solution = part2(example_file)
+    # print(f"Solution (example) part 2: {solution}")
+    # assert solution == ANSWER_EXAMPLE_PART_2
 
-    # print(f"Solution (input) part 2: {part2(input_file)}")
-    # assert part2(input_file) == ANSWER_INPUT_PART_2
+    # solution = part2(input_file)
+    # print(f"Solution (input) part 2: {solution}")
+    # assert solution == ANSWER_INPUT_PART_2
 
     print()
