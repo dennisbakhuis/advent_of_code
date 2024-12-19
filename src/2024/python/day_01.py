@@ -10,22 +10,7 @@ DAY = 1
 
 
 def part1(file_path: Path) -> int:
-    """
-    Compute the sum of distances between paired numbers in a data file.
-
-    Each line in the file contains a pair of integers, separated by a space.
-    The function sorts the first and second elements of each pair independently,
-    computes the differences between corresponding elements, and returns their sum.
-
-    Parameters
-    ----------
-    lines : list[str]
-
-    Returns
-    -------
-    int
-        The sum of distances between corresponding sorted pairs.
-    """
+    """Compute the sum of distances between paired numbers in a data file."""
     lines = aoc.Loader(file_path).as_lines()
 
     left, right = zip(*(map(int, line.split()) for line in lines), strict=True)
@@ -35,18 +20,7 @@ def part1(file_path: Path) -> int:
 
 
 def part2(file_path: Path) -> int:
-    """
-    Compute the sum of similarity scores of paired numbers in a data file.
-
-    Parameters
-    ----------
-    lines : list[str]
-
-    Returns
-    -------
-    int
-        The sum of similarity scores of the numbers.
-    """
+    """Compute the sum of similarity scores of paired numbers in a data file."""
     lines = aoc.Loader(file_path).as_lines()
 
     left, right = zip(*(map(int, line.split()) for line in lines), strict=True)

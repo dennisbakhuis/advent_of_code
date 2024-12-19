@@ -1,8 +1,10 @@
 """Calculate the perimeter of a group of connected coordinates."""
 
+from ..types import Coordinate
+
 
 def perimeter(
-    coordinates: set[tuple[int, int]],
+    coordinates: set[Coordinate],
     style: str = "minecraft",
 ) -> int:
     """
@@ -15,7 +17,7 @@ def perimeter(
 
     Parameters
     ----------
-    coordinates : set[tuple[int, int]]
+    coordinates : set[Coordinate]
         A set of 2D coordinates (x, y) representing connected cells.
     style : str, optional
         The style of perimeter calculation (default "minecraft").

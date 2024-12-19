@@ -3,6 +3,8 @@
 import re
 from typing import Iterable
 
+from .coordinate import Coordinate
+from .general_types import Bounds
 from ..grid.within_bounds import within_bounds
 
 
@@ -103,19 +105,17 @@ class TextMap:
         return self._n_rows
 
     @property
-    def bounds(self) -> tuple[int, int, int, int]:
+    def bounds(self) -> Bounds:
         """Bounds of the map as (min_x, min_y, max_x, max_y)."""
         return 0, 0, self._n_columns - 1, self._n_rows - 1
 
-    def get(
-        self, x: int | tuple[int, int], y: int = None, out_of_bounds_character: str = ""
-    ) -> str:
+    def get(self, x: int | Coordinate, y: int = None, out_of_bounds_character: str = "") -> str:
         """
         Get the character at the given coordinates.
 
         Parameters
         ----------
-        x : Union[int, Tuple[int, int]]
+        x : int | Coordinate
             X-coordinate (column) as an integer or a tuple containing (x, y).
         y : int, optional
             Y-coordinate (row). Required if `x` is an integer.
@@ -145,7 +145,7 @@ class TextMap:
         return self._map_string[y * self._n_columns + x]
 
     def get_many(
-        self, coordinates: Iterable[tuple[int, int]], out_of_bounds_character: str = ""
+        self, coordinates: Iterable[Coordinate], out_of_bounds_character: str = ""
     ) -> tuple[str, ...]:
         """
         Get characters at the given coordinates.
@@ -174,13 +174,13 @@ class TextMap:
         """Check if two TextMap objects are not equal based on _map_string."""
         return not self.__eq__(other)
 
-    def set(self, x: int | tuple[int, int], y: int | None = None, value: str = ...) -> None:
+    def set(self, x: int | Coordinate, y: int | None = None, value: str = ...) -> None:
         """
         Set the character at the given coordinates.
 
         Parameters
         ----------
-        x : int or tuple[int, int]
+        x : int or Coordinate
             X-coordinate (column) or a tuple of (x, y) coordinates.
         y : int, optional
             Y-coordinate (row). Required if `x` is an integer.
@@ -215,7 +215,7 @@ class TextMap:
 
         self._map_string = self._map_string[:ix] + value + self._map_string[ix + 1 :]
 
-    def set_many(self, coordinates: Iterable[tuple[int, int]], value: str) -> None:
+    def set_many(self, coordinates: Iterable[Coordinate], value: str) -> None:
         """
         Set the character at the given coordinates.
 
@@ -229,7 +229,7 @@ class TextMap:
         for x, y in coordinates:
             self.set(x, y, value)
 
-    def find(self, value: str) -> tuple[int, int]:
+    def find(self, value: str) -> Coordinate:
         """
         Find the first occurrence of a character.
 
@@ -244,9 +244,9 @@ class TextMap:
             Coordinates (x, y) of the character.
         """
         i = self._map_string.index(value)
-        return i % self._n_columns, i // self._n_columns
+        return Coordinate(i % self._n_columns, i // self._n_columns)
 
-    def find_all(self, value: str) -> list[tuple[int, int]]:
+    def find_all(self, value: str) -> list[Coordinate]:
         """
         Find all occurrences of a character.
 
@@ -261,7 +261,7 @@ class TextMap:
             All coordinates (x, y) of the character.
         """
         return [
-            (ix % self._n_columns, ix // self._n_columns)
+            Coordinate(ix % self._n_columns, ix // self._n_columns)
             for ix, c in enumerate(self._map_string)
             if c == value
         ]
@@ -299,7 +299,7 @@ class TextMap:
         """
         return TextMap(self.as_lines())
 
-    def pad(self, pading_size: int | list[int], fill: str = " ") -> "TextMap":
+    def pad(self, pading_size: int | tuple[int, int, int, int], fill: str = " ") -> "TextMap":
         """
         Add padding to the ASCII map on specified sides.
 
@@ -340,7 +340,7 @@ class TextMap:
         """Return the map as a string."""
         return self._map_string
 
-    def within_bounds(self, coordinates: tuple[int, int] | Iterable[tuple[int, int]]) -> bool:
+    def within_bounds(self, coordinates: Coordinate | Iterable[Coordinate]) -> bool:
         """
         Check if the coordinates are inside the map.
 
@@ -358,7 +358,7 @@ class TextMap:
         """
         return within_bounds(coordinates, self.bounds)
 
-    def find_horizontal_numbers(self) -> list[tuple[int, tuple[int, int], tuple[int, int]]]:
+    def find_horizontal_numbers(self) -> list[tuple[int, Coordinate, Coordinate]]:
         """
         Identify and locate all horizontal numbers (sequences of consecutive digits) in the ASCII map.
 
@@ -391,7 +391,7 @@ class TextMap:
 
     def switch_tiles(
         self,
-        coordinate_pairs: Iterable[tuple[tuple[int, int], tuple[int, int]]],
+        coordinate_pairs: Iterable[tuple[Coordinate, Coordinate]],
     ) -> None:
         """
         Switch tiles in the map.

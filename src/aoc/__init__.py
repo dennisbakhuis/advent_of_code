@@ -2,7 +2,7 @@
 
 from .loader import Loader
 from .data_files import DataFiles
-from . import grid, number, types
+from . import grid, number, types, tools
 
 DATA = DataFiles()
 
@@ -13,5 +13,6 @@ __all__ = [
     "grid",
     "Loader",
     "number",
+    "tools",
     "types",
 ]

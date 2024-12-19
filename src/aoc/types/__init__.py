@@ -1,9 +1,9 @@
 """Types used in in AoC."""
 
+from .coordinate import Coordinate
 from .direction import Direction
 from .general_types import (
     AdjacencyMap,
-    Coordinate,
     DijkstraPathTree,
     DijkstraScoringFunction,
     DijkstraDirectionScoringFunction,

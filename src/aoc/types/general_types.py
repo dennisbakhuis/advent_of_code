@@ -1,12 +1,14 @@
 """General types used in AoC."""
 
-from typing import NewType, Callable
+from typing import Callable
 
+from .coordinate import Coordinate
 from .direction import Direction
 
 
-Coordinate = NewType("Coordinate", tuple[int, int])
 AdjacencyMap = dict[Coordinate, set[Coordinate]]
+
+Bounds = tuple[int, int, int, int]  # (min_x, min_y, max_x, max_y)
 
 DijkstraScoringFunction = Callable[[Coordinate, Coordinate], int]
 DijkstraPathTree = dict[Coordinate, dict[str, int | list]]

@@ -3,13 +3,11 @@
 from typing import Iterable
 
 from ..types import Coordinate
-from ..constants import ADJACENCY_DELTAS, ADJACENCY_DELTAS_ONLY_DIAGONALS
 
 
 def is_adjacent(
     coordinate: Coordinate,
     other_coordinates: Coordinate | Iterable[Coordinate],
-    cross_sides: bool = True,
     diagonal_sides: bool = False,
 ) -> bool:
     """
@@ -36,15 +34,11 @@ def is_adjacent(
         `True` if `coord` is adjacent to any of the `other_coords` based on the specified parameters,
         `False` otherwise.
     """
-    deltas: set[Coordinate] = ADJACENCY_DELTAS if cross_sides else set()
-    if diagonal_sides:
-        deltas |= ADJACENCY_DELTAS_ONLY_DIAGONALS
-
-    adjacent_coordinates = set((coordinate[0] + dx, coordinate[1] + dy) for dx, dy in deltas)
-
-    print(adjacent_coordinates)
+    adjacent_candidates = (
+        coordinate.adjacent_with_diagonal if diagonal_sides else coordinate.adjacent
+    )
 
     if isinstance(other_coordinates, tuple) and isinstance(other_coordinates[0], int):
-        return other_coordinates in adjacent_coordinates
+        return other_coordinates in adjacent_candidates
     else:
-        return any(other in adjacent_coordinates for other in other_coordinates)
+        return any(other in adjacent_candidates for other in other_coordinates)

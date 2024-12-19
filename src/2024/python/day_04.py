@@ -2,7 +2,8 @@
 
 from pathlib import Path
 
-import aoc  # AoC helpers
+import aoc
+import aoc.constants  # AoC helpers
 
 
 YEAR = 2024
@@ -23,16 +24,7 @@ def part1(data_file: Path) -> int:
     word_start_locations = padded.find_all("X")
 
     count = 0
-    directions = [
-        (1, 0),
-        (-1, 0),
-        (0, 1),
-        (0, -1),
-        (1, 1),
-        (-1, -1),
-        (1, -1),
-        (-1, 1),
-    ]
+    directions = aoc.constants.ADJACENCY_DELTAS_WITH_DIAGONALS
 
     for x, y in word_start_locations:
         for dx, dy in directions:
